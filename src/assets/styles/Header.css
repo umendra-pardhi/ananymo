@@ -7,3 +7,11 @@
   font-weight: 900;
   margin: 0;
 }
+
+ .dropdown-menu[data-bs-popper] {
+  top: 100%;
+  right: 0;
+  left: auto;
+  margin-top: 0;
+  margin-right: var(--bs-dropdown-spacer);
+}

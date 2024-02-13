@@ -69,11 +69,6 @@ function Signup() {
         <GoogleBtn/>
         </div>
         
-        
-        
-        
-
-        
       </form>
     </main>
   );
@@ -116,5 +111,4 @@ const GoogleBtn = () => {
     );
   };
   
-
 export default Signup;

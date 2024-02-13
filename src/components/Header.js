@@ -2,16 +2,49 @@ import {Link} from 'react-router-dom'
 import logo from '../assets/img/logo.png'
 import logo2 from '../assets/img/hacker.svg'
 import '../assets/styles/Header.css'
-
+import { useState, useEffect } from 'react';
+import { onAuthStateChanged, getAuth,signOut } from 'firebase/auth';
 
 function Header(){
+
+
+  const auth = getAuth();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is logged in
+        setUser(user);
+        console.log(user)
+      } else {
+        // No user is logged in
+        setUser(null);
+      }
+    });
+  }, [auth]);
+
+  const SignOut = () => {
+    const auth = getAuth();
+
+    signOut(auth)
+      .then(() => {
+        console.log("Signed out ");
+      })
+      .catch((error) => {
+        // An error happened.
+        console.log(error);
+      });
+  };
+
+
   return(
 
-    <nav class="navbar bg-body-tertiary navbar-expand-lg ">
-  <div class="container-fluid justify-content-start">
+    <nav className="navbar bg-body-tertiary navbar-expand-lg ">
+  <div className="container-fluid justify-content-start">
 
-  <button class="navbar-toggler  text-primary-emphasis" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+  <button className="navbar-toggler  text-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+      <span className="navbar-toggler-icon"></span>
     </button>
   <h3 className="logo ms-3 ms-lg-5 ms-md-5">
 <span style={{color:"#4285f4"}}>A</span>
@@ -23,31 +56,93 @@ function Header(){
 <span style={{color:"#fbbc05"}}>O</span>
 </h3>
 
+{
+              user ? (
+                <>
+                {/* <i className="bi bi-person-circle"></i> */}
+                  
+                  {/* <button  className='btn btn-light rounded-circle m-0 p-0' style={{width:"42px", height:"42px"}}>
+                  <img width={"38px"}  className='rounded-circle' src="https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c" alt="" />
+                  </button> */}
+
+                 
+<div style={{width:"40%"}} className=' d-lg-none'>
+<div className="dropdown text-end text-end ">
+          <Link to="#" className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c" alt="mdo" width="32" height="32" className="rounded-circle"/>
+          </Link>
+          <ul className="dropdown-menu text-small">
+          <li><Link className="dropdown-item" to="/ask-question">Ask question...</Link></li>
+            <li><Link className="dropdown-item" to="/search-question">Search question</Link></li>
+            <li><Link className="dropdown-item" to="/user-dashboard">Profile</Link></li>
+            <li><hr className="dropdown-divider"/></li>
+            <li><button className="dropdown-item btn btn-sm btn-danger" onClick={SignOut} >Sign out</button></li>
+          </ul>
+        </div>
+</div>
+                </>
+              ):
+              <div style={{width:"40%"}} className='d-lg-none'>
+                <Link to={'/login'} className='btn btn-sm btn-outline-success float-end'>Log in</Link>
+              </div>
+            }
     
-    <div class="offcanvas offcanvas-start w-75" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header">
-        {/* <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5> */}
-        <button type="button" class="btn-close text-end" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <div className="offcanvas offcanvas-start w-75" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div className="offcanvas-header">
+        {/* <h5 className="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5> */}
+        <button type="button" className="btn-close text-end" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
-      <div class="offcanvas-body">
+      <div className="offcanvas-body">
       <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" >
       <li className="nav-item">
-                <Link className="nav-link text-success ms-lg-2 " aria-current="page" to="/"><i class="bi bi-house-fill "></i></Link>
+                <Link className="nav-link  ms-lg-2 " aria-current="page" to="/">Home{/*<i className="bi bi-house-fill "></i>*/}</Link>
               </li> 
               <li className="nav-item">
-                <Link className="nav-link ms-lg-2 text-success " aria-current="page" to="/about">About</Link>
+                <Link className="nav-link ms-lg-2 " aria-current="page" to="/about">About</Link>
               </li>                     
               
             </ul>
 
            <Link to={'/ask-question'} className='btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0'>Ask Question</Link>
             <form className="d-flex input-group w-auto  me-lg-5 mb-3 mb-lg-0" role="search">
-                <input type="text" class="form-control" placeholder="search question" aria-label="search" />
-                <button class="btn btn-outline-primary" type="button" id="button-addon2"><i class="bi bi-search"></i></button>
+                <input type="text" className="form-control" placeholder="search question" aria-label="search" />
+                <button className="btn btn-outline-dark" type="button" id="button-addon2"><i className="bi bi-search"></i></button>
             </form>
+
+            {
+              user ? (
+                <>
+                {/* <i className="bi bi-person-circle"></i> */}
+                  
+                  {/* <button  className='btn btn-light rounded-circle m-0 p-0' style={{width:"42px", height:"42px"}}>
+                  <img width={"38px"}  className='rounded-circle' src="https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c" alt="" />
+                  </button> */}
+
+                 
+
+<div className="dropdown text-end text-end d-none d-lg-block">
+          <Link to="#" className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c" alt="mdo" width="32" height="32" className="rounded-circle"/>
+          </Link>
+          <ul className="dropdown-menu text-small">
+          <li><Link className="dropdown-item" to="/ask-question">Ask question...</Link></li>
+            <li><Link className="dropdown-item" to="/search-question">Search question</Link></li>
+            <li><Link className="dropdown-item" to="/user-dashboard">Profile</Link></li>
+            <li><hr className="dropdown-divider"/></li>
+            <li><button className="dropdown-item btn btn-sm btn-danger" onClick={SignOut} >Sign out</button></li>
+          </ul>
+        </div>
+                </>
+              ):
+              
+                <Link to={'/login'} className='btn  btn-outline-success d-none d-lg-block me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0 '>Log in</Link>
+              
+            }
         
-        <Link to={'/login'} className='btn  btn-outline-success me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0'>Log in</Link>
-        <Link to={'/signup'} className='btn  btn-success me-lg-2  d-block'>Sign up</Link>
+        
+        {/* <Link to={'/signup'} className='btn  btn-success me-lg-2  d-block'>Sign up</Link> */}
+
+        
       </div>
     </div>
   </div>

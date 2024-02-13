@@ -28,6 +28,23 @@ function Home(){
 
         </div>
 
+<div className="container-fluid bg-body-tertiary p-5">
+<div className="container" >
+    <div className="row h-100 justify-content-evenly">
+        <div className="col-4 card p-3 bg-success-subtle text-success">
+            <h3>Ask Any Question that is in your Mind</h3>
+            <p>-Solution is Here for You</p>
+
+            
+
+
+        </div>
+        <div className="col-4 card bg-danger-subtle">
+        <lottie-player src="https://lottie.host/8c2fd1dd-1a40-4c74-855c-ea447e5901a2/Wrqcie0zg0.json" background="##FFFFFF" speed="1" style={{ height: "300px"}} loop autoplay direction="1" mode="normal"></lottie-player>
+        </div>
+    </div>
+</div>
+</div>
 
 
             <div className="fluid-container bg-success-subtle ps-5 pe-5 p-2 pt-3  mt-5 text-lg-start text-center">

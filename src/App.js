@@ -8,8 +8,8 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import AskQuestion from './components/AskQuestion';
-
-
+import app from "./init/firebase-init";
+import Dashboard from './components/user/Dashboard'
 
 function App() {
   return (
@@ -41,16 +41,16 @@ const router=createBrowserRouter([
       </>
     )
   },
-  {
-    path:'/signup',
-    element: (
-      <>
-        <Header/>
-        <Signup/>
-        <Footer/>
-      </>
-    )
-  },
+  // {
+  //   path:'/signup',
+  //   element: (
+  //     <>
+  //       <Header/>
+  //       <Signup/>
+  //       <Footer/>
+  //     </>
+  //   )
+  // },
   {
     path:'/ask-question',
     element: (
@@ -77,6 +77,16 @@ const router=createBrowserRouter([
       <>
         <Header/>
         <About/>
+        <Footer/>
+      </>
+    )
+  },
+  {
+    path: '/user-dashboard',
+    element: (
+      <>
+        <Header/>
+        <Dashboard/>
         <Footer/>
       </>
     )

@@ -1,32 +1,12 @@
 import React, { useState } from 'react';
 import "../assets/styles/Login.css";
 import {Link,  useNavigate} from 'react-router-dom';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 
 function Login() {
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
-
-
-// const Signin=()=>{
-// const auth = getAuth();
-// signInWithEmailAndPassword(auth, email, password)
-//   .then((userCredential) => {
-//     // Signed in 
-//     const user = userCredential.user;
-//     navigate('/');
-    
-//     // ...
-//   })
-//   .catch((error) => {
-//     const errorCode = error.code;
-//     const errorMessage = error.message;
-//   });
-
-// }
-
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
 
   return (
     <main class="form-signin w-100 m-auto text-center mt-5 ">
@@ -34,7 +14,7 @@ function Login() {
         {/* <img class="mb-4" src={logo} alt="" width="72" height="57"/> */}
         <h1 class="h3 mb-5 fw-normal text-primary ">Log in</h1>
 
-        <div class="form-floating shadow">
+        {/* <div class="form-floating shadow">
           <input
             type="email"
             class="form-control"
@@ -52,21 +32,15 @@ function Login() {
           />
           <label for="floatingPassword">Password</label>
         </div>
-
         <button class="btn btn-primary w-100 py-2 shadow" type="button" >
           Sign in
         </button>
+        <p className="text-center text-primary mt-3">or </p> */}
 
-        <p className="text-center text-primary mt-3">or </p>
         <div className="d-flex justify-content-center">
-        <GoogleBtn/>
+        <GoogleBtn  />
         </div>
-        
-        
-        
-        
-
-        
+       
       </form>
     </main>
   );
@@ -74,11 +48,40 @@ function Login() {
 
 
 const GoogleBtn = () => {
+  const navigate = useNavigate();
+  function SigninwithGoogle(){
+    const provider = new GoogleAuthProvider();
+    const auth = getAuth();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        console.log(user)
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+        navigate('/user-dashboard');
+      }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log(errorMessage)
+        // ...
+      });
+    
+    }
+
     return (
       <div className="d-flex justify-content-center shadow">
         <button
           className="btn-primary d-flex btn p-0 pe-2 border-0 align-items-center"
-          type="button" >
+          type="button" onClick={SigninwithGoogle} >
           <div className="bg-light p-2 rounded-start">
             <img
               width="40px"
