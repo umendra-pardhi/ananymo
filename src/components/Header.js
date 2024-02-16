@@ -40,7 +40,7 @@ function Header(){
 
   return(
 
-    <nav className="navbar bg-body-tertiary navbar-expand-lg ">
+    <nav className="shadow-sm navbar bg-body-tertiary navbar-expand-lg " style={{boxShadow:"1px 1px black"}}>
   <div className="container-fluid justify-content-start">
 
   <button className="navbar-toggler  text-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">

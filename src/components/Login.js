@@ -1,12 +1,87 @@
 import React, { useState } from 'react';
 import "../assets/styles/Login.css";
 import {Link,  useNavigate} from 'react-router-dom';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, getRedirectResult, signInWithRedirect, onAuthStateChanged } from "firebase/auth";
 
 
 function Login() {
 const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
+const [username, setUsername] = useState('');
+const [name,setName]=useState('')
+const [pp,setPP]=useState('')
+const [ansq_count,setAnsq_count]=useState();
+const [askq_count,setAskq_count]=useState()
+const [points,setPoints]=useState();
+
+
+// function writeUserData(userId, name, email, phone, password) {
+//   const db = getDatabase();
+//   if (isSp) {
+//     set(ref(db, "users/" + userId), {
+//       name: name,
+//       email: email,
+//       mob_number: phone,
+//       password: password,
+//       isAdmin: false,
+//       profile_pic: "",
+//       uid: "",
+//       city: "",
+//       state: "",
+//       latitude: "",
+//       longitude: "",
+//       location: "",
+//       isServiceP: isSp,
+//       charges: charges,
+//       category: category,
+//       availability: true,
+//       description: desc,
+//       address: "",
+//       category_image: "",
+//       pay_mode: "",
+//       upi_id:""
+//     });
+//     set(ref(db, "service_provider/" + userId), {
+//       name: name,
+//       email: email,
+//       mob_number: phone,
+//       password: password,
+//       isAdmin: false,
+//       profile_pic: "",
+//       uid: "",
+//       city: "",
+//       state: "",
+//       latitude: "",
+//       longitude: "",
+//       location: "",
+//       isServiceP: isSp,
+//       charges: charges,
+//       category: category,
+//       availability: true,
+//       description: desc,
+//       address: "",
+//       category_image: "",
+//       pay_mode: "",
+//       upi_id:""
+//     });
+//   } else {
+//     set(ref(db, "users/" + userId), {
+//       name: name,
+//       email: email,
+//       mob_number: phone,
+//       password: password,
+//       isAdmin: false,
+//       profile_pic: "",
+//       uid: "",
+//       city: "",
+//       state: "",
+//       latitude: "",
+//       longitude: "",
+//       location: "",
+//       isServiceP: isSp,
+//     });
+//   }
+// }
+
 
   return (
     <main class="form-signin w-100 m-auto text-center mt-5 ">
@@ -77,11 +152,43 @@ const GoogleBtn = () => {
     
     }
 
+    function SignInGoogle(){   
+      const provider = new GoogleAuthProvider();
+      const auth = getAuth();
+      signInWithRedirect(auth, provider);
+}
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+
+    navigate('/user-dashboard');
+  } else {
+
+  }
+});
+
+
+getRedirectResult(auth)
+  .then((result) => {
+    
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken; 
+    const user = result.user;
+
+    
+  }).catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    const credential = GoogleAuthProvider.credentialFromError(error);
+
+  });
+
+
     return (
       <div className="d-flex justify-content-center shadow">
         <button
           className="btn-primary d-flex btn p-0 pe-2 border-0 align-items-center"
-          type="button" onClick={SigninwithGoogle} >
+          type="button" onClick={SignInGoogle} >
           <div className="bg-light p-2 rounded-start">
             <img
               width="40px"

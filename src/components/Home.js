@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom'
+import QueBlock from './QueBlock';
 
 function Home(){
     return(
@@ -28,18 +29,37 @@ function Home(){
 
         </div>
 
-<div className="container-fluid bg-body-tertiary p-5">
+{/* questions*/}
+
+<div className="container pt-5 pb-5" >
+<div className="row">
+    <div className="col-6">
+    <h4>Top questions</h4>
+    </div>
+    <div className="col-6">
+        <Link to={"/ask-question"} className='btn btn-sm btn-primary float-end'>Ask Question</Link>
+    </div>
+</div>
+
+
+        <QueBlock votes={6} ans_count={3} view_count={8} q_title={"How can I automatically change the IP address on each request or when reconnecting in Selenium with Python?" } q_desc={"It is necessary to randomly select a proxy with authorization from proxies.txt for each request. It doesn't work as it should... import random import time from selenium import webdriver from ..."} img={"https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c"} username="anonymous" posted_on="15/02/2024" />
+
+<div className="container mt-5">
+<p style={{fontWeight:"350"}}>Looking for more? Browse the <Link to={"/questions"}>complete list of questions</Link>, or <Link to={"/questions"}>popular tags.</Link> Help us answer <Link to={"/questions"}>unanswered questions</Link>.</p>
+</div>
+</div>
+
+
+{/* promo banner */}
+<div className="container-fluid bg-warning-subtle p-5" >
 <div className="container" >
-    <div className="row h-100 justify-content-evenly">
-        <div className="col-4 card p-3 bg-success-subtle text-success">
-            <h3>Ask Any Question that is in your Mind</h3>
+    <div className="row h-100 justify-content-center gap-2">
+        <div className="col-12 col-lg-4 card p-3 bg--subtle  text-success">
+        <h3 className='' style={{fontWeight:"900"}}>Ask Any Question that is in your Mind</h3>
             <p>-Solution is Here for You</p>
 
-            
-
-
         </div>
-        <div className="col-4 card bg-danger-subtle">
+        <div className="col-12 col-lg-4 card ">
         <lottie-player src="https://lottie.host/8c2fd1dd-1a40-4c74-855c-ea447e5901a2/Wrqcie0zg0.json" background="##FFFFFF" speed="1" style={{ height: "300px"}} loop autoplay direction="1" mode="normal"></lottie-player>
         </div>
     </div>
@@ -47,7 +67,12 @@ function Home(){
 </div>
 
 
-            <div className="fluid-container bg-success-subtle ps-5 pe-5 p-2 pt-3  mt-5 text-lg-start text-center">
+
+
+
+
+{/** bottom ask question bar */}
+            <div className="fluid-container bg-success-subtle ps-5 pe-5 p-2 pt-3  text-lg-start text-center">
             <div className="row">
                 <div className="col-12 col-lg-10">
                 <h3>What do you need to know?</h3>

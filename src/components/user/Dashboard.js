@@ -18,6 +18,7 @@ function Dashboard() {
       setPic(user.photoURL)
 
     } else {
+      navigate('/login');
       setisLoggedin(null);
     }
   });
