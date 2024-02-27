@@ -13,7 +13,7 @@ function QueBlock(props){
             </div>
         </div>
   <div class="card-body">
-    <Link to={""}  class="text-decoration-none " >{props.q_title}</Link>
+    <Link to={`/questions/view?qid=${props.q_id}`}  class="text-decoration-none " >{props.q_title}</Link>
     <p style={{fontWeight:"400"}} className='card-text'>{props.q_desc}</p>
     {/* <div className="tags">
         <Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>

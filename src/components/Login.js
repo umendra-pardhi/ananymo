@@ -2,85 +2,20 @@ import React, { useState } from 'react';
 import "../assets/styles/Login.css";
 import {Link,  useNavigate} from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider, getRedirectResult, signInWithRedirect, onAuthStateChanged } from "firebase/auth";
+import { getDatabase, ref, set, get, child } from "firebase/database";
 
 
 function Login() {
-const [email, setEmail] = useState('');
-const [username, setUsername] = useState('');
-const [name,setName]=useState('')
-const [pp,setPP]=useState('')
-const [ansq_count,setAnsq_count]=useState();
-const [askq_count,setAskq_count]=useState()
-const [points,setPoints]=useState();
+// const [email, setEmail] = useState('');
+// const [username, setUsername] = useState('');
+// const [name,setName]=useState('')
+// const [pp,setPP]=useState('')
+// const [ansq_count,setAnsq_count]=useState();
+// const [askq_count,setAskq_count]=useState();
+// const [points,setPoints]=useState();
+// const [isNewUser,setNewUser]=useState(false)
 
 
-// function writeUserData(userId, name, email, phone, password) {
-//   const db = getDatabase();
-//   if (isSp) {
-//     set(ref(db, "users/" + userId), {
-//       name: name,
-//       email: email,
-//       mob_number: phone,
-//       password: password,
-//       isAdmin: false,
-//       profile_pic: "",
-//       uid: "",
-//       city: "",
-//       state: "",
-//       latitude: "",
-//       longitude: "",
-//       location: "",
-//       isServiceP: isSp,
-//       charges: charges,
-//       category: category,
-//       availability: true,
-//       description: desc,
-//       address: "",
-//       category_image: "",
-//       pay_mode: "",
-//       upi_id:""
-//     });
-//     set(ref(db, "service_provider/" + userId), {
-//       name: name,
-//       email: email,
-//       mob_number: phone,
-//       password: password,
-//       isAdmin: false,
-//       profile_pic: "",
-//       uid: "",
-//       city: "",
-//       state: "",
-//       latitude: "",
-//       longitude: "",
-//       location: "",
-//       isServiceP: isSp,
-//       charges: charges,
-//       category: category,
-//       availability: true,
-//       description: desc,
-//       address: "",
-//       category_image: "",
-//       pay_mode: "",
-//       upi_id:""
-//     });
-//   } else {
-//     set(ref(db, "users/" + userId), {
-//       name: name,
-//       email: email,
-//       mob_number: phone,
-//       password: password,
-//       isAdmin: false,
-//       profile_pic: "",
-//       uid: "",
-//       city: "",
-//       state: "",
-//       latitude: "",
-//       longitude: "",
-//       location: "",
-//       isServiceP: isSp,
-//     });
-//   }
-// }
 
 
   return (
@@ -124,6 +59,7 @@ const [points,setPoints]=useState();
 
 const GoogleBtn = () => {
   const navigate = useNavigate();
+ {/*
   function SigninwithGoogle(){
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
@@ -151,37 +87,115 @@ const GoogleBtn = () => {
       });
     
     }
+  */}
 
     function SignInGoogle(){   
       const provider = new GoogleAuthProvider();
       const auth = getAuth();
       signInWithRedirect(auth, provider);
 }
+
 const auth = getAuth();
+const db = getDatabase();
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
+ let uid=user.uid;
+ 
+ const dbRef = ref(db);
 
+get(child(dbRef,'users/' + uid)).then((snapshot) => {
+  if (snapshot.exists()) {
+    // console.log(snapshot.val());
     navigate('/user-dashboard');
   } else {
+    console.log("New user");
+    set(ref(db, "users/" + uid), {
+            name: user.displayName,
+            email: user.email,
+            pp: user.photoURL,
+            uid: user.uid,
+            username:user.uid,
+            ansq_count:0,
+            askq_count:0,
+            points: 0
+            
+          }).then(() => {
+             navigate('/user-dashboard');
+          });
 
+         
   }
+}).catch((error) => {
+  console.error(error);
 });
 
 
-getRedirectResult(auth)
-  .then((result) => {
+
+
+  // .ref(db,'users/' + uid).once('value').then(function(snapshot) {
+  //     var userData = snapshot.val();
+
+  //     if (!userData) {
+       
+  //       set(ref(db, "users/" + uid), {
+  //       name: user.displayName,
+  //       email: user.email,
+  //       pp: user.photoURL,
+  //       uid: user.uid,
+  //       username:user.uid,
+  //       ansq_count:0,
+  //       askq_count:0,
+  //       points: 0
+        
+  //     });
+
+  //       // });
+  //     }
+  //   });
+
+
+    console.log(user)
+    // writeUserData()
+    navigate('/user-dashboard');
+  } 
+
+  // function writeUserData(uid,username,name, email, pp) {
+  //   const db = getDatabase();
     
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken; 
-    const user = result.user;
+  //   if (isNewUser) {
+  //     set(ref(db, "users/" + uid), {
+  //       name: name,
+  //       email: email,
+  //       pp: pp,
+  //       uid: uid,
+  //       username:username,
+  //       ansq_count:0,
+  //       askq_count:0,
+  //       points: 0
+        
+  //     });
+     
+  //   }
+  // }
+
+});
+
+
+// getRedirectResult(auth)
+//   .then((result) => {
+    
+//     const credential = GoogleAuthProvider.credentialFromResult(result);
+//     const token = credential.accessToken; 
+//     // const user = result.user;
 
     
-  }).catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    const credential = GoogleAuthProvider.credentialFromError(error);
+//   }).catch((error) => {
+//     const errorCode = error.code;
+//     const errorMessage = error.message;
+//     const credential = GoogleAuthProvider.credentialFromError(error);
 
-  });
+//   });
 
 
     return (

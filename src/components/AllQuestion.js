@@ -1,7 +1,83 @@
 import QueBlock from './QueBlock';
 import { Link } from 'react-router-dom';
+import { getDatabase,ref, get, } from 'firebase/database';
+import { useState,useEffect } from 'react';
 
 function AllQuestion(){
+
+    
+const [questions,setQue]=useState([]);
+const [userData,setUserdata]=useState([]);
+const [combinedData,setCombinedData]=useState([])
+
+useEffect(() => {
+    const database = getDatabase();
+    const dbRef = ref(database, "users");
+
+    get(dbRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = [];
+          snapshot.forEach((child) => {
+            data.push({
+              key: child.key,
+              uid: child.val().uid,
+              pp: child.val().pp,
+            });
+          });
+          setUserdata(data);
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+useEffect(() => {
+    const database = getDatabase();
+    const dbRef = ref(database, "questions");
+
+
+    get(dbRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = [];
+          snapshot.forEach((child) => {
+            data.push({
+              key: child.key,
+              uid: child.val().uid,
+              q_id: child.val().q_id,
+              title: child.val().title,
+              desc: child.val().desc,
+              ans_count: child.val().ans_count,
+              vote_count: child.val().vote_count,
+              date: (child.val().date).match(/^\w+\s\w+\s\d+/)[0],
+              tags: "",
+              views: child.val().views,     
+            });
+          });
+          setQue(data);
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+
+  useEffect(() => {
+    setCombinedData(
+      questions.map((questions) => ({
+        ...questions,
+        pp: userData.find((user) => user.uid === questions.uid)?.pp, // Find matching user and add pp
+      }))
+    );
+  }, [questions, userData]); 
+
     return(
         <div className="container pt-5 pb-5" >
 <div className="row">
@@ -14,7 +90,11 @@ function AllQuestion(){
 </div>
 
 
-        <QueBlock votes={6} ans_count={3} view_count={8} q_title={"How can I automatically change the IP address on each request or when reconnecting in Selenium with Python?" } q_desc={"It is necessary to randomly select a proxy with authorization from proxies.txt for each request. It doesn't work as it should... import random import time from selenium import webdriver from ..."} img={"https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c"} username="anonymous" posted_on="15/02/2024" />
+{combinedData.map((child) => (
+
+<QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={child.desc} img={child.pp} username={child.uid} posted_on={child.date} />
+
+))}
 
 </div>
     )

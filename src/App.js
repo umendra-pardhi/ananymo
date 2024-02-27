@@ -98,20 +98,26 @@ const router=createBrowserRouter([
   {
     path:'/search-question',
     element: <>
+     <Header/>
         <QueBlock/>
+        <Footer/>
     </>
   },
   {
     path:'/questions',
     element: <>
+    <Header/>
        <AllQuestion/>
+       <Footer/>
     </>
   },
   {
     path:'/questions/view',
     element: <>
     <Header/>
+
         <ViewQuestion/>
+        <Footer/>
     </>
   }
 

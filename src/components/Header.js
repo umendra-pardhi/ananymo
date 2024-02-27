@@ -4,19 +4,24 @@ import logo2 from '../assets/img/hacker.svg'
 import '../assets/styles/Header.css'
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, getAuth,signOut } from 'firebase/auth';
+import { getDatabase,ref,get, } from 'firebase/database';
 
 function Header(){
 
 
   const auth = getAuth();
   const [user, setUser] = useState(null);
+  const [pp,setPP]=useState();
+  const [uid,setUID]=useState();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is logged in
         setUser(user);
-        console.log(user)
+      
+        setPP(user.photoURL)
+
       } else {
         // No user is logged in
         setUser(null);
@@ -36,6 +41,7 @@ function Header(){
         console.log(error);
       });
   };
+
 
 
   return(
@@ -69,7 +75,7 @@ function Header(){
 <div style={{width:"40%"}} className=' d-lg-none'>
 <div className="dropdown text-end text-end ">
           <Link to="#" className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c" alt="mdo" width="32" height="32" className="rounded-circle"/>
+            <img src={pp} alt="pp" width="32" height="32" className="rounded-circle"/>
           </Link>
           <ul className="dropdown-menu text-small">
           <li><Link className="dropdown-item" to="/ask-question">Ask question...</Link></li>
@@ -122,7 +128,7 @@ function Header(){
 
 <div className="dropdown text-end text-end d-none d-lg-block">
           <Link to="#" className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://lh3.googleusercontent.com/a/ACg8ocKuduhyDnHPrBhrzuCn6rXpCBECYFWmnxVIK0GQLwwQdiY=s96-c" alt="mdo" width="32" height="32" className="rounded-circle"/>
+            <img src={pp} alt="pp" width="32" height="32" className="rounded-circle"/>
           </Link>
           <ul className="dropdown-menu text-small">
           <li><Link className="dropdown-item" to="/ask-question">Ask question...</Link></li>
