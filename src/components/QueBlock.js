@@ -13,7 +13,7 @@ function QueBlock(props){
             </div>
         </div>
   <div class="card-body">
-    <Link to={`/questions/view?qid=${props.q_id}`}  class="text-decoration-none " >{props.q_title}</Link>
+    <Link to={`/questions/view?qid=${props.q_id}`} state={{ scrollToTop: true }}  class="text-decoration-none " >{props.q_title}</Link>
     <p style={{fontWeight:"400"}} className='card-text'>{props.q_desc}</p>
     {/* <div className="tags">
         <Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>
@@ -36,4 +36,37 @@ function QueBlock(props){
     )
 }
 
-export default QueBlock;
+
+function QueBlockLoading(){
+    return(
+     
+<div class="card m-3 placeholder-glow">
+
+        <div className="card-header">
+            <div className="row justify-content-between">
+                <div className="col col-lg-3 placeholder"></div>
+                <div className="col col-lg-3 placeholder"></div>
+                <div className="col col-lg-3 placeholder"></div>
+            </div>
+        </div>
+  <div class="card-body ">
+    <div className="col-10 placeholder"></div>
+    <div className="col-8 placeholder"></div><br/>
+    <div className="col-6 placeholder"></div><br/>
+    <div className="col-3 placeholder"></div>
+   
+  </div>
+  <div class="card-footer " style={{fontWeight:"300"}}>
+  <div className="row justify-content-end gap-3 ">
+    <div className="col-3 placeholder">
+    </div><div className="col-2 placeholder">
+    </div>
+
+  </div>
+    
+  </div>
+</div>
+    )
+}
+
+export  {QueBlock,QueBlockLoading};

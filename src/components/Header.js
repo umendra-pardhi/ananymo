@@ -13,6 +13,7 @@ function Header(){
   const [user, setUser] = useState(null);
   const [pp,setPP]=useState();
   const [uid,setUID]=useState();
+  const [searchQuery,setSearchQuery]=useState('');
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -111,8 +112,8 @@ function Header(){
 
            <Link to={'/ask-question'} className='btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0'>Ask Question</Link>
             <form className="d-flex input-group w-auto  me-lg-5 mb-3 mb-lg-0" role="search">
-                <input type="text" className="form-control" placeholder="search question" aria-label="search" />
-                <button className="btn btn-outline-dark" type="button" id="button-addon2"><i className="bi bi-search"></i></button>
+                <input type="text" className="form-control" placeholder="search question" aria-label="search"  onChange={(e)=>{setSearchQuery(e.target.value)}} />
+                <Link to={`/search-question?q=${searchQuery}`} className="btn btn-outline-dark" type="button" id="button-addon2"><i className="bi bi-search"></i></Link>
             </form>
 
             {

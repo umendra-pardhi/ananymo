@@ -3,20 +3,8 @@ import "../assets/styles/Login.css";
 import {Link,  useNavigate} from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider, getRedirectResult, signInWithRedirect, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, set, get, child } from "firebase/database";
-
-
+import Spinner from './Spinner';
 function Login() {
-// const [email, setEmail] = useState('');
-// const [username, setUsername] = useState('');
-// const [name,setName]=useState('')
-// const [pp,setPP]=useState('')
-// const [ansq_count,setAnsq_count]=useState();
-// const [askq_count,setAskq_count]=useState();
-// const [points,setPoints]=useState();
-// const [isNewUser,setNewUser]=useState(false)
-
-
-
 
   return (
     <main class="form-signin w-100 m-auto text-center mt-5 ">
@@ -48,7 +36,7 @@ function Login() {
         <p className="text-center text-primary mt-3">or </p> */}
 
         <div className="d-flex justify-content-center">
-        <GoogleBtn  />
+        <GoogleBtn />
         </div>
        
       </form>
@@ -56,43 +44,16 @@ function Login() {
   );
 }
 
-
 const GoogleBtn = () => {
   const navigate = useNavigate();
- {/*
-  function SigninwithGoogle(){
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        console.log(user)
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
-        navigate('/user-dashboard');
-      }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        console.log(errorMessage)
-        // ...
-      });
-    
-    }
-  */}
+  const [d,setD]=useState(false)
 
     function SignInGoogle(){   
       const provider = new GoogleAuthProvider();
       const auth = getAuth();
       signInWithRedirect(auth, provider);
+      setD(true)
+            
 }
 
 const auth = getAuth();
@@ -101,13 +62,15 @@ const db = getDatabase();
 onAuthStateChanged(auth, (user) => {
   if (user) {
  let uid=user.uid;
- 
+
  const dbRef = ref(db);
 
 get(child(dbRef,'users/' + uid)).then((snapshot) => {
   if (snapshot.exists()) {
     // console.log(snapshot.val());
     navigate('/user-dashboard');
+    setD(false)
+
   } else {
     console.log("New user");
     set(ref(db, "users/" + uid), {
@@ -122,82 +85,18 @@ get(child(dbRef,'users/' + uid)).then((snapshot) => {
             
           }).then(() => {
              navigate('/user-dashboard');
-          });
-
-         
+             setD(false)
+          });    
   }
 }).catch((error) => {
   console.error(error);
 });
 
-
-
-
-  // .ref(db,'users/' + uid).once('value').then(function(snapshot) {
-  //     var userData = snapshot.val();
-
-  //     if (!userData) {
-       
-  //       set(ref(db, "users/" + uid), {
-  //       name: user.displayName,
-  //       email: user.email,
-  //       pp: user.photoURL,
-  //       uid: user.uid,
-  //       username:user.uid,
-  //       ansq_count:0,
-  //       askq_count:0,
-  //       points: 0
-        
-  //     });
-
-  //       // });
-  //     }
-  //   });
-
-
-    console.log(user)
-    // writeUserData()
-    navigate('/user-dashboard');
+  console.log(user)
+  navigate('/user-dashboard');
   } 
 
-  // function writeUserData(uid,username,name, email, pp) {
-  //   const db = getDatabase();
-    
-  //   if (isNewUser) {
-  //     set(ref(db, "users/" + uid), {
-  //       name: name,
-  //       email: email,
-  //       pp: pp,
-  //       uid: uid,
-  //       username:username,
-  //       ansq_count:0,
-  //       askq_count:0,
-  //       points: 0
-        
-  //     });
-     
-  //   }
-  // }
-
 });
-
-
-// getRedirectResult(auth)
-//   .then((result) => {
-    
-//     const credential = GoogleAuthProvider.credentialFromResult(result);
-//     const token = credential.accessToken; 
-//     // const user = result.user;
-
-    
-//   }).catch((error) => {
-//     const errorCode = error.code;
-//     const errorMessage = error.message;
-//     const credential = GoogleAuthProvider.credentialFromError(error);
-
-//   });
-
-
     return (
       <div className="d-flex justify-content-center shadow">
         <button
@@ -211,6 +110,8 @@ get(child(dbRef,'users/' + uid)).then((snapshot) => {
           </div>
           <div className="ms-2">Continue with Google</div>
         </button>
+
+        {!d ? <Spinner display='d-none'/> : <Spinner display='d-block'/>}
       </div>
     );
   };

@@ -1,14 +1,14 @@
-import QueBlock from './QueBlock';
+import {QueBlock,QueBlockLoading} from './QueBlock';
 import { Link } from 'react-router-dom';
 import { getDatabase,ref, get, } from 'firebase/database';
 import { useState,useEffect } from 'react';
 
 function AllQuestion(){
 
-    
 const [questions,setQue]=useState([]);
 const [userData,setUserdata]=useState([]);
 const [combinedData,setCombinedData]=useState([])
+const [isDataLoaded,setDataLoaded]=useState(false);
 
 useEffect(() => {
     const database = getDatabase();
@@ -59,6 +59,7 @@ useEffect(() => {
             });
           });
           setQue(data);
+          setDataLoaded(true)
         } else {
           console.log("No data available");
         }
@@ -67,8 +68,7 @@ useEffect(() => {
         console.error(error);
       });
   }, []);
-
-
+  
   useEffect(() => {
     setCombinedData(
       questions.map((questions) => ({
@@ -77,27 +77,34 @@ useEffect(() => {
       }))
     );
   }, [questions, userData]); 
-
+  
     return(
         <div className="container pt-5 pb-5" >
 <div className="row">
     <div className="col-6">
-    <h4>All questions</h4>
+    <h4>All Questions</h4>
     </div>
     <div className="col-6">
         <Link to={"/ask-question"} className='btn btn-sm btn-primary float-end'>Ask Question</Link>
     </div>
 </div>
 
+{ isDataLoaded? 
+combinedData.slice(0, 10).map((child) => (
 
-{combinedData.map((child) => (
+        <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={child.desc} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
 
-<QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={child.desc} img={child.pp} username={child.uid} posted_on={child.date} />
+))
+:
+<>
+<QueBlockLoading/>
+<QueBlockLoading/>
+<QueBlockLoading/>
+</>
 
-))}
+}
 
 </div>
     )
 }
-
 export default AllQuestion;

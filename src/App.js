@@ -10,9 +10,13 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import AskQuestion from './components/AskQuestion';
 import app from "./init/firebase-init";
 import Dashboard from './components/user/Dashboard'
-import QueBlock from './components/QueBlock';
+import {QueBlock,QueBlockLoading} from './components/QueBlock';
 import ViewQuestion from './components/ViewQuestion';
 import AllQuestion from './components/AllQuestion';
+import AdminHome from './components/admin/AdminHome';
+import ScrollTop from './components/ScrollTop';
+import Test from './components/Test';
+import SearchQuestion from './components/SearchQuestion';
 
 
 function App() {
@@ -66,16 +70,6 @@ const router=createBrowserRouter([
     )
   },
   {
-    path: '/admin',
-    element: (
-      <>
-        <h1>
-          This is admin Page
-        </h1>
-      </>
-    )
-  },
-  {
     path: '/about',
     element: (
       <>
@@ -99,7 +93,7 @@ const router=createBrowserRouter([
     path:'/search-question',
     element: <>
      <Header/>
-        <QueBlock/>
+        <SearchQuestion/>
         <Footer/>
     </>
   },
@@ -118,6 +112,21 @@ const router=createBrowserRouter([
 
         <ViewQuestion/>
         <Footer/>
+    </>
+  },
+  {
+    path:'/admin',
+    element: <>
+    <Header/>
+
+       <AdminHome/>
+        <Footer/>
+    </>
+  },
+  {
+    path:'/test',
+    element: <>
+   <Test/>
     </>
   }
 

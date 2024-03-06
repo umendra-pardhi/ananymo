@@ -1,36 +1,68 @@
-import { useState,useEffect,useRef } from "react";
-import { useLocation,Link } from "react-router-dom";
-import { getDatabase,ref,get,child,update,onValue,set,push,orderByChild,equalTo } from "firebase/database";
-import { getAuth,onAuthStateChanged } from "firebase/auth";
+import { useState, useEffect, useRef } from "react";
+import { useLocation, Link } from "react-router-dom";
+
+import {
+  getDatabase,
+  ref,
+  get,
+  child,
+  update,
+  onValue,
+  set,
+  push,
+  orderByChild,
+  equalTo,
+} from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {AnswerList,AnswerListLoading} from "./AnswerList";
+import Spinner from "./Spinner";
 
 function ViewQuestion(props) {
-
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const qidp = queryParams.get("qid");
-  const [qid,setQid]=useState(qidp);
-  const [qData,setQData]=useState([])
-  const [quid,setQuid]=useState()
-  const [pp,setPP]=useState()  
+  const [qid, setQid] = useState(qidp);
+  const [qData, setQData] = useState([]);
+  const [quid, setQuid] = useState();
+  const [pp, setPP] = useState();
   const [voteCount, setVoteCount] = useState(0);
   const [hasVotedUp, setHasVotedUp] = useState(false);
-const [hasVotedDown, setHasVotedDown] = useState(false);
-const [ansData,setAnsData]=useState([])
+  const [hasVotedDown, setHasVotedDown] = useState(false);
+  const [ansData, setAnsData] = useState([]);
 
-const [isLoading, setIsLoading] = useState(false);
-const [successMessage, setSuccessMessage] = useState('');
-const [ansBody, setAnsBody] = useState("");
-const [isLoggedin, setisLoggedin] = useState(false);
-const [uid, setUID] = useState();
-const [hasAnswered, setHasAnswered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [ansBody, setAnsBody] = useState("");
+  const [isLoggedin, setisLoggedin] = useState(false);
+  const [uid, setUID] = useState();
+  const [voteValue, setVoteValue] = useState(0);
+  const [ansCount, setAnsCount] = useState(0);
+  const [isDataLoaded,setDataLoaded]=useState(false);
+  const [valLoaded,setValLoaded]=useState(false)
+  const [voteLoaded,setVoteLoaded]=useState(false);
 
-const auth = getAuth();
+  const auth = getAuth();
+
+  useEffect(() => {
+    const updateViewCount = async () => {
+      try {
+        const snapshot = await get(questionRef.current);
+        if (snapshot.exists()) {
+          var views = snapshot.val().views || 0;
+          await update(questionRef.current, { views: views + 1 });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    updateViewCount();
+  }, []);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUID(user.uid);
-        setPP(user.photoURL)
+        setPP(user.photoURL);
         setisLoggedin(true);
       } else {
         setisLoggedin(false);
@@ -38,102 +70,111 @@ const auth = getAuth();
     });
   }, [isLoggedin]);
 
-{/* question data */}
+  {
+    /* question data */
+  }
 
   useEffect(() => {
     const database = getDatabase();
     const dbRef = ref(database, "questions");
-
     const unsubscribe = onValue(dbRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const data = [];
-          snapshot.forEach((child) => {
-            if (child.val().q_id === qid) {
-              setQuid(child.val().uid)
-
-              data.push({
-                key: child.key,
+      if (snapshot.exists()) {
+        const data = [];
+        snapshot.forEach((child) => {
+          if (child.val().q_id === qid) {
+            setQuid(child.val().uid);
+            data.push({
+              key: child.key,
               uid: child.val().uid,
-              duid:(child.val().uid).slice(0,6),
+              duid: child.val().uid.slice(0, 6),
               q_id: child.val().q_id,
               title: child.val().title,
-              desc: (child.val().desc),
+              desc: child.val().desc,
               ans_count: child.val().ans_count,
               vote_count: child.val().vote_count,
-              date: (child.val().date).match(/^\w+\s\w+\s\d+/)[0],
+              date: child.val().date.match(/^\w+\s\w+\s\d+/)[0],
               tags: "",
-              views: child.val().views,   
-
-              });
-            }
-          });
-setQData(data);
-         
-        } 
-      })
-      
-
-      return () => unsubscribe();
+              views: child.val().views,
+            });
+          }
+        });
+        setQData(data);
+        setDataLoaded(true)
+      }
+    });
+    return () => unsubscribe();
   }, [qid]);
 
-//  {/*Users Data*/ }
-//   useEffect(() => {
-//     const database = getDatabase();
-//     const dbRef = ref(database, "users");
+  const dbvote = getDatabase();
+useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+    var uidn=user.uid;   
 
-//     onValue(dbRef, (snapshot) =>  {
-//         if (snapshot.exists()) {
-//           const data = [];
-//           snapshot.forEach((child) => {
-//             if (child.val().uid === quid) {
-//               setPP(child.val().pp)
+console.log(qid+uidn)
+    onValue(ref(dbvote, "votes/" + qid + uidn) , (ss) => {
+      if (ss.exists()) {
+        var value = ss.val().value;
+        setVoteValue(value); 
+        console.log(value);
+        setVoteLoaded(true);
 
-//             }
-//           });
+      }else {
+     set(voteRef, {
+          uid: uid,
+          q_id: qid,
+          vote_id: qid + uid,
+          value: 0,
+        });
+        setVoteValue(0);
+        setValLoaded(true);
+        setVoteLoaded(true);
+      }
 
-//         } 
-//       })
-      
-//   }, [qid]);
+    });
 
+  }
+});
+  }, []);
 
-  {/*Answers Data*/ }
+  
+
+  {
+    /*Answers Data*/
+  }
   useEffect(() => {
     const database = getDatabase();
     const dbRef = ref(database, "answers");
-
     get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           const data = [];
           snapshot.forEach((child) => {
-            if (child.val().q_id === qid) {
+            if (child.val().q_id == qid) {
               data.push({
-                uid:child.val().uid,
-                pp:child.val().pp,
-                ansBody:child.val().ansBody,
-                vote_count:child.val().vote_count,
-                date: (child.val().date).match(/^\w+\s\w+\s\d+/)[0],
-                
+                ans_id:child.val().ans_id,
+                uid: child.val().uid,
+                pp: child.val().pp,
+                ansBody: child.val().ansBody,
+                vote_count: child.val().vote_count,
+                date: child.val().date.match(/^\w+\s\w+\s\d+/)[0],
               });
-
             }
           });
-          setAnsData(data)    
-    
-        } 
+          setAnsData(data);
+          setAnsCount(ansData.length);
+          updateAnsCount(data.length)
+        }
       })
       .catch((error) => {
         console.error(error);
-
       });
   }, [qid]);
 
-
-
+ 
 
   const database = getDatabase();
-  const questionRef = useRef(ref(database, `questions/${qid}`)); // Use ref
+  const questionRef = useRef(ref(database, `questions/${qid}`)); 
 
   useEffect(() => {
     const fetchVoteCount = async () => {
@@ -141,6 +182,7 @@ setQData(data);
         const snapshot = await get(questionRef.current);
         if (snapshot.exists()) {
           setVoteCount(snapshot.val().vote_count);
+          setAnsCount(snapshot.val().ans_count);
         }
       } catch (error) {
         console.error("Error fetching vote count:", error);
@@ -150,168 +192,379 @@ setQData(data);
     fetchVoteCount();
   }, [qid]);
 
-  const handleVoteUp = async () => {
-    if (!hasVotedUp) {
+  const voteRef = ref(database, "votes/" + qid + uid);
+
+  
+  const voteUp = async () => {
+   
+    try {
+      const snapshot2 = await get(voteRef);
+     
+      if (snapshot2.exists()) {
+        var value = snapshot2.val().value;
+        setVoteValue(value);
+        setValLoaded(true);          
+
+      } else {
+        await set(voteRef, {
+          uid: uid,
+          q_id: qid,
+          vote_id: qid + uid,
+          value: 0,
+        });
+        setVoteValue(0);
+        setValLoaded(true);
+      }
+
+      if(valLoaded){
+        const snapshot = await get(questionRef.current);
+        if (snapshot.exists()) {
+          const votecount = snapshot.val().vote_count;
+       
+          if (voteValue === 0) {
+            setVoteValue(1);
+            await update(questionRef.current, { vote_count: votecount + 1 });
+            await update(voteRef, { value: 1 });
+    
+          }else if (voteValue === -1){
+            setVoteValue(0);
+            await update(questionRef.current, { vote_count: votecount + 1 });
+            await update(voteRef, { value: 0 });
+          }
+    
+    
+        }
+    
+      }
+
+    } catch (e) {
+      console.error("Error fetching vote value:", e);
+    }
+   
+   
+  };
+
+  const voteDown = async () => {
+   
+    try {
+      const snapshot2 = await get(voteRef);
+     
+      if (snapshot2.exists()) {
+        var value = snapshot2.val().value;
+        setVoteValue(value);
+        setValLoaded(true);          
+
+      } else {
+        await set(voteRef, {
+          uid: uid,
+          q_id: qid,
+          vote_id: qid + uid,
+          value: 0,
+        });
+        setVoteValue(0);
+        setValLoaded(true);
+      }
+
+      if(valLoaded){
+        const snapshot = await get(questionRef.current);
+        if (snapshot.exists()) {
+          const votecount = snapshot.val().vote_count;
+       
+          if (voteValue === 1) {
+            setVoteValue(0);
+            await update(questionRef.current, { vote_count: votecount - 1 });
+            await update(voteRef, { value: 0 });
+
+          }else if (voteValue === 0){
+            setVoteValue(-1);
+            await update(questionRef.current, { vote_count: votecount - 1 });
+            await update(voteRef, { value: -1 });
+          }
+          
+    
+    
+        }
+    
+      }
+
+    } catch (e) {
+      console.error("Error fetching vote value:", e);
+    }
+  };
+
+  const qRef = useRef(ref(database, `questions/${qid}`));
+  const aRef = useRef(ref(database, `answers/${qid + uid}`));
+  const updateAnsCount = async (anscount) => {
+    try {
+      const snapshot = await get(qRef.current);
+      if (snapshot.exists()) {
+        await update(questionRef.current, { ans_count: anscount });
+        console.log("function called")
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  
+  function submitAns() {
+    if (ansBody === "") {
+      alert("Answer must be non-empty");
+      return;
+    }
+    if (!isLoggedin) {
+      alert("Login first");
+      return;
+    }
+    setIsLoading(true);
+    setSuccessMessage("");
+    // const db = getDatabase();
+    const date = new Date().toString();
+    const db = getDatabase();
+    const child = qid + uid;
+    const aRef = ref(db, "answers/" + child);
+
+    set(aRef, {
+      uid: uid,
+      q_id: qid,
+      ans_id: child,
+      ansBody: ansBody,
+      vote_count: 0,
+      date: date,
+      tags: "",
+      pp: pp,
+    })
+      .then(() => {
+        setSuccessMessage("Answer successfully posted!");
+        setIsLoading(false);
+        updateAnsCount(ansCount);
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
+  }
+
+
+//   ans vote
+const AnsvoteUp = async (ans_id,uid,database) => {
+    const voteRef = ref(database, "votes/" + ans_id + uid);
+    const ansRef = useRef(ref(database, `answers/${ans_id + uid}`));
+  try {
+      const snapshot2 = await get(voteRef);
+    if (snapshot2.exists()) {
+      var value = snapshot2.val().value;
+      setVoteValue(value);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  try {
+    const snapshot = await get(ansRef.current);
+    if (snapshot.exists()) {
+      var votecount = snapshot.val().vote_count;
+
       try {
-        await update(questionRef.current, { vote_count: voteCount + 1 });
-        setVoteCount(voteCount + 1);
+        await update(ansRef.current, { vote_count: votecount + 1 });
+        set(voteRef, {
+          uid: uid,
+          a_id: ans_id,
+          vote_id: ans_id + uid,
+          value: true,
+          votedUp: false,
+          votedDown: true,
+        })
+          .then(() => {})
+          .catch((error) => {
+            console.error(error);
+          });
+        // setHasVotedUp(true);
+        // setHasVotedDown(false);
+      } catch (error) {
+        console.error("Error voting up:", error);
+      }
+    } else {
+    }
+  } catch (error) {
+    console.error("Error fetching vote count:", error);
+  }
+};
+const AnsvoteDown = async () => {
+  try {
+    const snapshot = await get(questionRef.current);
+    if (snapshot.exists()) {
+      var votecount = snapshot.val().vote_count;
+
+      try {
+        await update(questionRef.current, { vote_count: votecount - 1 });
+        set(voteRef, {
+          uid: uid,
+          q_id: qid,
+          vote_id: qid + uid,
+          value: false,
+          votedUp: false,
+          votedDown: true,
+        })
+          .then(() => {})
+          .catch((error) => {
+            console.error(error);
+          });
+
         setHasVotedUp(true);
         setHasVotedDown(false);
       } catch (error) {
         console.error("Error voting up:", error);
       }
     }
-  };
-
-  const handleVoteDown = async () => {
-    if (!hasVotedDown) {
-      try {
-        await update(questionRef.current, { vote_count: voteCount - 1 });
-        setVoteCount(voteCount - 1);
-        setHasVotedDown(true);
-        setHasVotedUp(false);
-      } catch (error) {
-        console.error("Error voting down:", error);
-      }
-    }
-  };
-
-  {/*
-  useEffect(() => {
-    // Check if the user has already answered this question
-    const database = getDatabase();
-    const dbRef = ref(database, "answers");
-    const query = get(child(dbRef, qid), orderByChild("uid"), equalTo(uid));
-
-    onValue(query, (snapshot) => {
-      if (snapshot.exists()) {
-        setHasAnswered(true);
-      }
-    });
-
-  }, [qid, uid]);
-*/}
-
-  function submitAns() {
-
-    if (ansBody === "") {
-      alert("Answer must be non-empty");
-      return;
-    }
-    
-    if (!isLoggedin) {
-      alert("Login first");
-      return;
-    }
-
-
-    setIsLoading(true);
-    setSuccessMessage('');
-    const db = getDatabase();
-    const date = new Date().toString();
-  
-    const aRef = ref(db, 'answers');
-    const newARef = push(aRef); // Generate a unique child key
-    const newAId = newARef.key;
-  
-    set(newARef, {
-      uid: uid,
-      q_id: qid ,
-      ans_id: newAId,
-      ansBody: ansBody,
-      vote_count: 0,
-      date: date,
-      tags: "",
-      pp: pp,
-    
-    }).then(() => {
-      setSuccessMessage('Answer successfully posted!');
-      setIsLoading(false);
-    }).catch((error) => {
-      console.error(error);
-      setIsLoading(false);
-    });
+  } catch (error) {
+    console.error("Error fetching vote count:", error);
   }
+};
+
 
   return (
     <div className="container">
+  
       {/* view question  */}
-      {qData.map((child)=>(
-      <div class="card m-3">
-        <div className="card-header">
-          <div className="row">
-            <div className="card-title">
-              {child.title}
+{
+  isDataLoaded ?
+      qData.map((child) => (
+        <div class="card m-3">
+          <div className="card-header">
+            <div className="row">
+              <div className="card-title">{child.title}</div>
+            </div>
+            <div className="row " style={{ fontWeight: "350" }}>
+              <div className="col col-lg-3">asked on {child.date}</div>
+              <div className="col col-lg-3">
+                <span className="badge text-bg-success">
+                  {ansData.length} answers
+                </span>
+              </div>
+              <div className="col col-lg-3">{child.views} views</div>
             </div>
           </div>
-          <div className="row " style={{ fontWeight: "350" }}>
-            <div className="col col-lg-3">asked on {child.date}</div>
-            <div className="col col-lg-3">
-              <span className="badge text-bg-success">
-                {child.ans_count} answers
-              </span>
-            </div>
-            <div className="col col-lg-3">0 views</div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div className="row">
-            <div className="col-3  row col-lg-1" style={{ height: "200px" }}>
-              <div className="col-12">
-                <button id="voteup" className="btn btn-outline-primary rounded-circle p-2 lh-1" onClick={handleVoteUp}>
-                <i class="bi bi-caret-up-fill"></i>
-                </button>
-              </div>
-              <div className="col-12">
-                <h5 className="m-0 ms-2 mt-1 mb-1 mt-lg-2 mb-lg-2">{child.vote_count}</h5>
-              </div>
-              <div className="col-12">
-                <button id="votedown" className="btn btn-outline-primary rounded-circle p-2 lh-1" onClick={handleVoteDown}>
-                <i class="bi bi-caret-down-fill"></i>
-                </button>
-              </div>
-            </div>
-            <div className="col-9 col-lg-10 ">
-              <p style={{ fontWeight: "400" }} className="card-text">
-               {child.desc}
-              </p>
-            </div>
-          </div>
+          <div class="card-body">
+            <div className="row">
+              <div className="col-3  row col-lg-1" style={{ height: "200px" }}>
+               
+                <div className="col-12">
+                  <button
+                    id="voteup"
+                    className="btn btn-outline-primary rounded-circle p-2 lh-1"
+                    onClick={voteUp} disabled={voteValue === 1}>
+                    <i class="bi bi-caret-up-fill"></i>
+                    {/* <i class="bi bi-hand-thumbs-up"></i> */}
+                  </button>
+                </div>
+                <div className="col-12">
+                  <h5 className="m-0 ms-2 mt-1 mb-1 mt-lg-2 mb-lg-2">
+                    {child.vote_count}
+                  </h5>
+                </div>
+                <div className="col-12">
+                  <button
+                    id="votedown"
+                    className="btn btn-outline-primary rounded-circle p-2 lh-1"
+                    onClick={voteDown} disabled={voteValue === -1} >
+                    <i className="bi bi-caret-down-fill"></i>
+                    {/* <i class="bi bi-hand-thumbs-down"></i> */}
+                  </button>
+                </div>
 
-          {/* <div className="tags">
+        
+              </div>
+              <div className="col-9 col-lg-10 ">
+                <p style={{ fontWeight: "400" }} className="card-text">
+                  {child.desc}
+                </p>
+              </div>
+            </div>
+
+            {/* <div className="tags">
 <Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>
     python
 </Link>
 </div> */}
-        </div>
-        <div class="card-footer " style={{ fontWeight: "300" }}>
-          <div className="row float-end">
-            <div className="col">
-              <img
-                className="card rounded-circle d-inline"
-                width={"30px"}
-                src={pp}
-                alt=""
-              />
-              <span className="ms-1 text-primary">{child.duid}</span>
-              <span className="ms-1">asked {child.date}</span>
+          </div>
+          <div class="card-footer " style={{ fontWeight: "300" }}>
+            <div className="row float-end">
+              <div className="col">
+                <img
+                  className="card rounded-circle d-inline"
+                  width={"30px"}
+                  src={pp}
+                  alt=""
+                />
+                <span className="ms-1 text-primary">{child.duid}</span>
+                <span className="ms-1">asked {child.date}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
       ))
-      }
-   {/* view question end */}
+:
+//Loading Data
+<div class="card m-3 placeholder-glow">
+          <div className="card-header">
+            <div className="row">
+              <div className="card-title placeholder"></div>
+            </div>
+            <div className="row justify-content-evenly" style={{ fontWeight: "350" }}>
+              <div className="col-3 placeholder"></div>
+              <div className="col-3 placeholder">
+              </div>
+              <div className="col-3 placeholder"></div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div className="row">
+              <div className="col-3  row flex-column  justify-content-evenly " style={{ height: "200px" }}>
+                <div className="col-4 p-3 placeholder">
+                 
+                </div>
+                <div className="col-2 p-2 placeholder">
+                  
+                </div>
+                <div className="col-4 p-3 placeholder">
+                  
+                </div>
+              </div>
+              <div className="col-9 col-lg-10 ">
+               <div className="col-12 placeholder"></div> <br/>
+               <div className="col-8 placeholder"></div><br/>
+               <div className="col-6 placeholder"></div><br/>
+               <div className="col-4 placeholder"></div><br/>
+               <div className="col-3 placeholder"></div>
+              </div>
+            </div>
 
+            {/* <div className="tags">
+<Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>
+    python
+</Link>
+</div> */}
+          </div>
+          <div class="card-footer " style={{ fontWeight: "300" }}>
+            <div className="row justify-content-end gap-3">
+              <div className="col-3 placeholder">
+              </div>
+              <div className="col-3 placeholder">
+              </div>
+            </div>
+          </div>
+        </div>
 
+}
+      {/* view question end */}
 
       {/* answers  */}
       <div className="container-fluid mt-5">
-      {/* ans_top_header */}
+        {/* ans_top_header */}
         <div className="row justify-content-between">
           <div className="col col-lg-4">
-            <h5>5 Answers</h5>
+            <h5>{ansData.length} Answers</h5>
           </div>
           <div className="col col-lg-4 " style={{ fontWeight: "400" }}>
             sorted by:
@@ -331,222 +584,124 @@ setQData(data);
         </div>
         {/* ans_top_header end */}
 
+        {/* answers-list */}
 
-{/* answers-list */}
+        {ansData.map((child) => (
+          <AnswerList
+            ansBody={child.ansBody}
+            vote_count={child.vote_count}
+            username={child.uid.slice(0, 6)}
+            posted_on={child.date}
+            pp={child.pp}
 
-{ansData.map((child) => (
+          />
+        ))}
+        {/* answers-list end*/}
 
-  <Answer ansBody={child.ansBody} vote_count={child.vote_count} username={(child.uid).slice(0,6)} posted_on={child.date} pp={child.pp} />
-))
-
-} 
-{/* answers-list end*/}
-
-
-
-<PostAnswer 
-            isLoading={isLoading}
-            successMessage={successMessage}
-            ansBody={ansBody}
-      onChange={(event) => {
-      setAnsBody(event.target.value);
-    }}
-onClick={submitAns}             />
-        
+        <PostAnswer
+          isLoading={isLoading}
+          successMessage={successMessage}
+          ansBody={ansBody}
+          onChange={(event) => {
+            setAnsBody(event.target.value);
+          }}
+          onClick={submitAns}
+        />
       </div>
-    </div>
-  )
 
+      {voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
+    </div>
+  );
 }
 
-function Answer(props){
 
-    return(
-        <div class="card m-3">
-        
-        <div class="card-body">
-          <div className="row">
-            <div className="col-3  row col-lg-1" style={{ height: "200px" }}>
-              <div className="col-12">
-              <button className="btn btn-outline-primary rounded-circle p-2 lh-1">
-                <i class="bi bi-caret-up-fill"></i>
-                </button>
-              </div>
-              <div className="col-12">
-                <h5 className="m-0 ms-2 mt-1 mb-1 mt-lg-2 mb-lg-2">{props.vote_count}</h5>
-              </div>
-              <div className="col-12">
-              <button className="btn btn-outline-primary rounded-circle p-2 lh-1">
-                <i class="bi bi-caret-down-fill"></i>
-                </button>
-              </div>
-            </div>
-            <div className="col-9 col-lg-10 ">
-              <p style={{ fontWeight: "400" }} className="card-text">
-                {props.ansBody}
+function PostAnswer(props) {
+  return (
+    <div className="container p-3">
+      <div className="row">
+        <div className="col-12 ">
+          <h3>Your Answer</h3>
+          {/* <form action={this}> */}
+
+          <div className="form-container mt-2 mb-2 card p-3">
+            <label
+              htmlFor="ansBody"
+              className="ms-1 mb-2"
+              style={{ fontSize: "12px", fontWeight: "400" }}>
+              <h6 className="m-0">Answer Body</h6>
+              Reminder: Answers generated by artificial intelligence tools are
+              not allowed
+            </label>
+            <textarea
+              class="form-control form-control-sm"
+              id="ansBody"
+              rows="6"
+              value={props.ansBody}
+              onChange={props.onChange}
+              required></textarea>
+          </div>
+
+          <div
+            class="alert alert-warning alert-dismissible fade show mt-3 mb-3"
+            style={{ fontSize: "12px", fontWeight: "400" }}
+            role="alert">
+            <div class="">
+              <p>Thanks for contributing an answer to Anonymo!</p>
+              <ul>
+                <li>
+                  Please be sure to <em>answer the question</em>. Provide
+                  details and share your research!
+                </li>
+              </ul>
+              <p>
+                But <em>avoid</em> …
+              </p>
+              <ul>
+                <li>
+                  Asking for help, clarification, or responding to other
+                  answers.
+                </li>
+                <li>
+                  Making statements based on opinion; back them up with
+                  references or personal experience.
+                </li>
+              </ul>
+              <p>
+                To learn more, see our{" "}
+                <Link to="/help/how-to-answer">
+                  tips on writing great answers
+                </Link>
+                .
               </p>
             </div>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"></button>
           </div>
 
-          {/* <div className="tags">
-<Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>
-    python
-</Link>
-</div> */}
-        </div>
-        <div class="card-footer " style={{ fontWeight: "300" }}>
-          <div className="row float-end">
-            <div className="col">
-              <img
-                className="card rounded-circle d-inline"
-                width={"30px"}
-                src={props.pp}
-                alt=""
-              />
-              <span className="ms-1 text-primary">{props.username}</span>
-              <span className="ms-1">asked {props.posted_on}</span>
+          <button
+            type="submit"
+            className="btn btn-dark mt-3 "
+            {...props}
+            // data-bs-toggle="modal"
+            // data-bs-target="#spinner"
+            disabled={props.isLoading}>
+            {props.isLoading ? "Posting Answer..." : "POST YOUR ANSWER"}
+          </button>
+          {props.successMessage && (
+            <div className="alert alert-success mt-3" role="alert">
+              {props.successMessage}
             </div>
-          </div>
+          )}
+
+          {!props.isLoading? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
+          {/* </form> */}
         </div>
       </div>
-    )
-}
-
-
-function PostAnswer(props){
- {/*
-const [isLoading, setIsLoading] = useState(false);
-const [successMessage, setSuccessMessage] = useState('');
-const [ansBody, setAnsBody] = useState("");
-
-
-const [uid, setUID] = useState();
-  const [isLoggedin, setisLoggedin] = useState(false);
-
-
-  const auth = getAuth();
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUID(user.uid);
-        setisLoggedin(true);
-      } else {
-        setisLoggedin(false);
-      }
-    });
-  }, [isLoggedin]);
-
-
-  function submitAns() {
-
-
-    if (ansBody === "") {
-      alert("Answer must be non-empty");
-      return;
-    }
-    
-    if (!isLoggedin) {
-      alert("Login first");
-      return;
-    }
-  
-    setIsLoading(true);
-    setSuccessMessage('');
-    const db = getDatabase();
-    const date = new Date().toString();
-  
-    const aRef = ref(db, 'answers');
-    const newARef = push(aRef); // Generate a unique child key
-    const newAId = newARef.key;
-  
-    set(newARef, {
-      uid: uid,
-      q_id: props.qid ,
-      ans_id: newAId,
-      ansBody: ansBody,
-      vote_count: 0,
-      date: date,
-      tags: "",
-      pp: props.pp ,
-    
-    }).then(() => {
-      setSuccessMessage('Answer successfully posted!');
-      setIsLoading(false);
-    }).catch((error) => {
-      console.error(error);
-      setIsLoading(false);
-    });
-  }
-  
-*/}
-
-  return(
-    <div className="container p-3">
-    <div className="row">
-      <div className="col-12 ">
-        <h3>Your Answer</h3>
-        {/* <form action={this}> */}
-
-       
-        <div className="form-container mt-2 mb-2 card p-3">
-          <label
-            htmlFor="ansBody"
-            className="ms-1 mb-2"
-            style={{ fontSize: "12px", fontWeight: "400" }}>
-            <h6 className="m-0">Answer Body</h6>
-            Reminder: Answers generated by artificial intelligence tools are not allowed
-          </label>
-          <textarea
-            class="form-control form-control-sm"
-            id="ansBody"
-            rows="6"
-        
-     value={props.ansBody}
-     onChange={props.onChange}
-     
-            required></textarea>
-        </div>
-
-
-        <div class="alert alert-warning alert-dismissible fade show mt-3 mb-3"      style={{ fontSize: "12px", fontWeight: "400" }} role="alert">
-
-  <div class="flex--item pt8">
-        <p>Thanks for contributing an answer to Anonymo!</p>
-        <ul>
-        <li>Please be sure to <em>answer the question</em>. Provide details and share your research!</li>
-        </ul>
-        <p>But <em>avoid</em> …</p>
-        <ul><li>Asking for help, clarification, or responding to other answers.</li>
-        <li>Making statements based on opinion; back them up with references or personal experience.</li>
-        </ul>
-        <p>To learn more, see our <Link to="/help/how-to-answer">tips on writing great answers</Link>.</p>
-    </div>
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-
-        
-        <button
-          type="submit"
-          className="btn btn-dark mt-3 "
-          {...props}
-          // data-bs-toggle="modal"
-          // data-bs-target="#spinner" 
-          disabled={props.isLoading}>
-          {props.isLoading ? 'Posting Answer...' : 'POST YOUR ANSWER'}
-        </button>
-        {props.successMessage && <div className="alert alert-success mt-3" role="alert">
-        
-            {props.successMessage}</div>}
-        {/* </form> */}
-
-      </div>
-
-
       
     </div>
-  </div>
-
-  )
+  );
 }
 export default ViewQuestion;

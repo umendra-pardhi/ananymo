@@ -1,6 +1,7 @@
 import "../assets/styles/Footer.css";
 
 import { Link } from 'react-router-dom';
+import ScrollTop from "./ScrollTop";
 
 function Footer() {
     return (
@@ -44,7 +45,7 @@ function Footer() {
                     </p>
                 </div>
             </div>
-
+<ScrollTop/>
         </footer>
     );
 }

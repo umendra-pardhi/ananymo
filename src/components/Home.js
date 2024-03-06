@@ -1,14 +1,17 @@
 import {Link} from 'react-router-dom'
-import QueBlock from './QueBlock';
+import {QueBlock,QueBlockLoading} from './QueBlock';
 import '../assets/styles/Home.css'
 import { useState,useEffect } from 'react';
 import { getDatabase,ref, get, } from 'firebase/database';
+import Spinner from './Spinner';
 
 function Home(){
 
 const [questions,setQue]=useState([]);
 const [userData,setUserdata]=useState([]);
-const [combinedData,setCombinedData]=useState([])
+const [combinedData,setCombinedData]=useState([]);
+const [isDataLoaded,setDataLoaded]=useState(false);
+const [searchQuery0,setSearchQuery0]=useState('')
 
 useEffect(() => {
     const database = getDatabase();
@@ -60,6 +63,7 @@ useEffect(() => {
             });
           });
           setQue(data);
+          setDataLoaded(true)
         } else {
           console.log("No data available");
         }
@@ -94,8 +98,8 @@ useEffect(() => {
             help others answer theirs
             </h5>
             <form className="d-flex input-group w-auto mt-2  me-lg-5 mb-3 mb-lg-0 p-2 rounded-4 shadow  bg-light" role="search">
-                <input type="text" class="form-control border-0" style={{height:'70px', fontSize:'22px'}} placeholder="what is your question?" aria-label="search" />
-                <button class="btn btn-outline-dark rounded-4  " style={{width:"70px",height:'70px'}} type="button" id="button-addon2"><i class="bi bi-search"></i></button>
+                <input  type="text" class="form-control border-0" style={{height:'70px', fontSize:'22px'}} placeholder="what is your question?" aria-label="search" onChange={(e)=>{setSearchQuery0(e.target.value)}} />
+                <Link to={`/search-question?q=${searchQuery0}`}><button  class="btn btn-outline-dark rounded-4 " style={{width:"70px",height:'70px'}} type="button" id="button-addon2"><i class="bi bi-search"></i></button></Link>
             </form>
                 
             </div>
@@ -119,12 +123,20 @@ useEffect(() => {
     </div>
 </div>
 
-
-{combinedData.slice(0, 10).map((child) => (
+{ isDataLoaded? 
+combinedData.slice(0, 10).map((child) => (
 
         <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={child.desc} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
 
-))}
+))
+:
+<>
+<QueBlockLoading/>
+<QueBlockLoading/>
+<QueBlockLoading/>
+</>
+
+}
 <div className="container mt-5">
 <p style={{fontWeight:"350"}}>Looking for more? Browse the <Link to={"/questions"}>complete list of questions</Link>, or Help us answer <Link to={"/questions"}>unanswered questions</Link>.</p>
 </div>
@@ -161,14 +173,15 @@ useEffect(() => {
                 </div>
                 <div className="col-12 col-lg-2 text-center ">
 <Link to={'/ask-question'} className='btn  btn-outline-success p-2 mt-3'>Ask Question</Link>
-                
+
                 </div>
             </div>
 
             </div>
+
+            {/* {isDataLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> } */}
+
         </div>
-
-
     )
 }
 

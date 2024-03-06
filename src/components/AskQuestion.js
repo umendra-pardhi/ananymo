@@ -2,6 +2,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, child, set, get, push, runTransaction } from "firebase/database";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Spinner from "./Spinner";
+import Alert from "./Alert";
 
 function AskQuestion() {
   const [title, setTitle] = useState("");
@@ -12,11 +14,14 @@ function AskQuestion() {
 
 const [isLoading, setIsLoading] = useState(false);
 const [successMessage, setSuccessMessage] = useState('');
+const [d,setD]=useState(false)
+const [isDataLoaded,setDataLoaded]=useState(false);
 
   const auth = getAuth();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      setDataLoaded(true)
       if (user) {
         setUID(user.uid);
         setisLoggedin(true);
@@ -60,6 +65,8 @@ const [successMessage, setSuccessMessage] = useState('');
       date: date,
       tags: "",
       views: 0,
+      likes:0,
+      dislikes:0,
     }).then(() => {
       setSuccessMessage('Question successfully posted!');
       setIsLoading(false);
@@ -159,23 +166,7 @@ const [successMessage, setSuccessMessage] = useState('');
 
       {/* modalwithspinner */}
 
- 
-      {/* <div
-        class="modal modal-sm fade"
-        id="spinner"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body text-center">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Please Wait...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
+      {!isLoading ? <Spinner display='d-none'/> : <Spinner display='d-block'/>}
     </>
   );
 }

@@ -2,7 +2,7 @@ import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Spinner from "../Spinner";
-function Dashboard() {
+function AdminHome() {
   const [isLoggedin,setisLoggedin]=useState(null);
   const auth = getAuth();
   const [name,setName]=useState("name...");
@@ -44,7 +44,7 @@ function Dashboard() {
 
   return (
     <>
-    <div className="container p-4 p-lg-5">
+    <div className="container p-3 p-lg-3">
       <div className="row justify-content-center gap-2 ">
         <div className="col-12 col-lg-5 card p-1 p-lg-2">
           <div className="d-flex justify-content-end">
@@ -154,4 +154,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default AdminHome;
