@@ -16,6 +16,7 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {AnswerList,AnswerListLoading} from "./AnswerList";
 import Spinner from "./Spinner";
+import ScanAbusive from "./ScanAbusive";
 
 function ViewQuestion(props) {
   const location = useLocation();
@@ -40,6 +41,7 @@ function ViewQuestion(props) {
   const [isDataLoaded,setDataLoaded]=useState(false);
   const [valLoaded,setValLoaded]=useState(false)
   const [voteLoaded,setVoteLoaded]=useState(false);
+
 
   const auth = getAuth();
 
@@ -314,6 +316,10 @@ console.log(qid+uidn)
     }
     if (!isLoggedin) {
       alert("Login first");
+      return;
+    }
+    if(ScanAbusive(ansBody)){
+      alert("Don't use abusive words!");
       return;
     }
     setIsLoading(true);
@@ -616,6 +622,14 @@ const AnsvoteDown = async () => {
 
 
 function PostAnswer(props) {
+  const [isAbusive,setIsAbusive]=useState()
+  useEffect(()=>{
+
+    setIsAbusive(ScanAbusive(props.ansBody))
+    console.log(isAbusive)
+  
+    }, [props.ansBody])
+
   return (
     <div className="container p-3">
       <div className="row">
@@ -633,12 +647,16 @@ function PostAnswer(props) {
               not allowed
             </label>
             <textarea
-              class="form-control form-control-sm"
+              class={`form-control form-control-sm ${isAbusive ? "is-invalid": props.ansBody.length>20? "is-valid":""}`}
               id="ansBody"
               rows="6"
               value={props.ansBody}
               onChange={props.onChange}
               required></textarea>
+               { props.ansBody&&
+              <div className={`${isAbusive ? "invalid-feedback":"valid-feedback"}`} style={{fontWeight:"350"}}>
+                {isAbusive ? "Answer contains abusive Language!": "Ready to post Answer"}
+              </div>}
           </div>
 
           <div

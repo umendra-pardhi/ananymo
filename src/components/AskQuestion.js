@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 import Alert from "./Alert";
+import ScanAbusive from "./ScanAbusive";
 
 function AskQuestion() {
   const [title, setTitle] = useState("");
@@ -16,12 +17,14 @@ const [isLoading, setIsLoading] = useState(false);
 const [successMessage, setSuccessMessage] = useState('');
 const [d,setD]=useState(false)
 const [isDataLoaded,setDataLoaded]=useState(false);
+const [isAbusive,setIsAbusive]=useState()
+const [isAbusiveDesc,setAbusiveDesc]=useState();
 
   const auth = getAuth();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      setDataLoaded(true)
+      setDataLoaded(true);
       if (user) {
         setUID(user.uid);
         setisLoggedin(true);
@@ -45,7 +48,15 @@ const [isDataLoaded,setDataLoaded]=useState(false);
       alert("Login first");
       return;
     }
-  
+    if(isAbusive){
+      alert("Don't use abusive words!");
+      return;
+    }
+    if(isAbusiveDesc){
+      alert("Don't use abusive words!");
+      return;
+    }
+    
     setIsLoading(true);
     setSuccessMessage('');
     const db = getDatabase();
@@ -75,8 +86,20 @@ const [isDataLoaded,setDataLoaded]=useState(false);
       setIsLoading(false);
     });
   }
-  
 
+  useEffect(()=>{
+
+  setIsAbusive(ScanAbusive(title))
+  // console.log(isAbusive)
+
+  }, [title])
+
+  useEffect(()=>{
+    setAbusiveDesc(ScanAbusive(desc))
+    // console.log(isAbusiveDesc)
+
+    }, [desc])
+  
   return (
     <>
       <div className="container p-3">
@@ -95,7 +118,7 @@ const [isDataLoaded,setDataLoaded]=useState(false);
                 person.
               </label>
               <input
-                className="form-control form-control-sm "
+                className={`form-control form-control-sm ${isAbusive ? "is-invalid": title.length>20? "is-valid":""}`}
                 type="text"
                 name="title"
                 id="title"
@@ -107,6 +130,10 @@ const [isDataLoaded,setDataLoaded]=useState(false);
                   setTitle(event.target.value);
                 }} required
               />
+              { title&&
+              <div className={`${isAbusive ? "invalid-feedback":"valid-feedback"}`} style={{fontWeight:"350"}}>
+                {isAbusive ? "Question contains abusive Language!": "Ready to post question"}
+              </div>}
             </div>
 
             <div className="form-container mt-2 mb-2 card p-3">
@@ -119,7 +146,7 @@ const [isDataLoaded,setDataLoaded]=useState(false);
                 results. Minimum 220 characters.
               </label>
               <textarea
-                class="form-control form-control-sm"
+                className={`form-control form-control-sm ${isAbusiveDesc ? "is-invalid": desc.length>50? "is-valid":""}`}
                 id="desc"
                 rows="6"
                 placeholder="Explain how you encountered the problem you’re trying to solve, and any difficulties that have prevented you from solving it yourself."
@@ -128,6 +155,10 @@ const [isDataLoaded,setDataLoaded]=useState(false);
                   setDesc(event.target.value);
                 }}
                 required></textarea>
+                { desc&&
+              <div className={`${isAbusiveDesc ? "invalid-feedback":"valid-feedback"}`} style={{fontWeight:"350"}}>
+                {isAbusiveDesc ? "Question body contains abusive Language!":"Ready to post question"}
+              </div>}
             </div>
 
             {
@@ -139,7 +170,7 @@ const [isDataLoaded,setDataLoaded]=useState(false);
               onClick={submitQue}
               // data-bs-toggle="modal"
               // data-bs-target="#spinner" 
-              disabled={isLoading}>
+              disabled={isLoading} >
               {isLoading ? 'Please wait...' : 'ASK YOUR QUESTION'}
             </button>
             {successMessage && <div className="alert alert-success mt-3" role="alert">

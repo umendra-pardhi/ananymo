@@ -17,6 +17,7 @@ import AdminHome from './components/admin/AdminHome';
 import ScrollTop from './components/ScrollTop';
 import Test from './components/Test';
 import SearchQuestion from './components/SearchQuestion';
+import ScanAbusive  from './components/ScanAbusive';
 
 
 function App() {
@@ -128,6 +129,10 @@ const router=createBrowserRouter([
     element: <>
    <Test/>
     </>
+  },
+  {
+    path:'/scanabusive',
+    element: <ScanAbusive/>
   }
 
 

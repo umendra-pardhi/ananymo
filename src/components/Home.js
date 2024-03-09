@@ -98,8 +98,8 @@ useEffect(() => {
             help others answer theirs
             </h5>
             <form className="d-flex input-group w-auto mt-2  me-lg-5 mb-3 mb-lg-0 p-2 rounded-4 shadow  bg-light" role="search">
-                <input  type="text" class="form-control border-0" style={{height:'70px', fontSize:'22px'}} placeholder="what is your question?" aria-label="search" onChange={(e)=>{setSearchQuery0(e.target.value)}} />
-                <Link to={`/search-question?q=${searchQuery0}`}><button  class="btn btn-outline-dark rounded-4 " style={{width:"70px",height:'70px'}} type="button" id="button-addon2"><i class="bi bi-search"></i></button></Link>
+                <input  type="text" class="form-control border-0" style={{height:'70px', fontSize:'22px'}} placeholder="what is your question?" aria-label="search" value={searchQuery0} onChange={(e)=>{setSearchQuery0(e.target.value)}} />
+                <Link to={`/search-question?q=${searchQuery0}`} ><button  class="btn btn-outline-dark rounded-4 " style={{width:"70px",height:'70px'}} type="button" id="button-addon2"><i class="bi bi-search"></i></button></Link>
             </form>
                 
             </div>

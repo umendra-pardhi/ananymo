@@ -97,6 +97,7 @@ function SearchQuestion() {
             style={{ height: "70px", fontSize: "22px" }}
             placeholder="what is your question?"
             aria-label="search"
+            value={Qquery}
             onChange={(e) => {
               setQquery(e.target.value);
             }}
@@ -126,9 +127,14 @@ function SearchQuestion() {
             Ask Question
           </Link>
         </div> */}
+{ combinedData.map((child)=>{
+        <QueBlockLoading  />
+        
+})
+}
       </div>
 
-            {/* <QueNotFound/> */}
+            <QueNotFound/>
 
     </div>
   );
@@ -144,7 +150,6 @@ function QueNotFound() {
         speed="1"
         style={{width: "300px", height: "300px"}}
         loop
-
         autoplay
         direction="1"
         mode="normal"></lottie-player>
