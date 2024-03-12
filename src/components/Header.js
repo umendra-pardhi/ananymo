@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged, getAuth,signOut } from 'firebase/auth';
 import { getDatabase,ref,get, } from 'firebase/database';
 
-function Header(){
+function Header(props){
 
 
   const auth = getAuth();
@@ -14,6 +14,8 @@ function Header(){
   const [pp,setPP]=useState();
   const [uid,setUID]=useState();
   const [searchQuery,setSearchQuery]=useState('');
+  const [questions,setQue]=useState([]);
+  const [isDataLoaded,setDataLoaded]=useState(false);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -43,7 +45,45 @@ function Header(){
       });
   };
 
+  useEffect(() => {
+    const database = getDatabase();
+    const dbRef = ref(database, "questions");
+    get(dbRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = [];
+          snapshot.forEach((child) => {
+            data.push({
+              key: child.key,
+              uid: child.val().uid,
+              duid:(child.val().uid).slice(0,6),
+              q_id: child.val().q_id,
+              title: child.val().title,
+              desc: child.val().desc,
+              ans_count: child.val().ans_count,
+              vote_count: child.val().vote_count,
+              date: (child.val().date).match(/^\w+\s\w+\s\d+/)[0],
+              tags: "",
+              views: child.val().views,     
+            });
+          });
+          setQue(data);
+          setDataLoaded(true);
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
+
+  const filteredQuestions = questions.filter((question) => {
+    if(searchQuery.length>0){
+    return question.title.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+  });
 
   return(
 
@@ -78,8 +118,10 @@ function Header(){
           <Link to="#" className="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
             <img src={pp} alt="pp" width="32" height="32" className="rounded-circle"/>
           </Link>
+         
           <ul className="dropdown-menu text-small">
           <li><Link className="dropdown-item" to="/ask-question">Ask question...</Link></li>
+          <li><Link className="dropdown-item" to="/quiz">Quiz</Link></li>
             <li><Link className="dropdown-item" to="/search-question">Search question</Link></li>
             <li><Link className="dropdown-item" to="/user-dashboard">Profile</Link></li>
             <li><hr className="dropdown-divider"/></li>
@@ -110,12 +152,29 @@ function Header(){
               
             </ul>
 
-           <Link to={'/ask-question'} className='btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0'>Ask Question</Link>
-            <form className="d-flex input-group w-auto  me-lg-5 mb-3 mb-lg-0" role="search">
-                <input type="text" className="form-control" placeholder="search question" aria-label="search" value={searchQuery}  onChange={(e)=>{setSearchQuery(e.target.value)}} />
-                <Link to={`/search-question?q=${searchQuery}`} className="btn btn-outline-dark" type="button" id="button-addon2"><i className="bi bi-search"></i></Link>
-            </form>
+           <Link to={'/ask-question'} className={`btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0 ${props.searchQ&&"me-lg-5"}`}>Ask Question</Link>
+           { !props.searchQ&&
 
+           <div className="dropdown-center">
+            <form className="d-flex input-group w-auto  me-lg-5 mb-3 mb-lg-0" data-bs-toggle="dropdown" aria-expanded="false" role="search">
+                <input type="text" className="form-control "  placeholder="search question" aria-label="search" value={searchQuery}  onChange={(e)=>{setSearchQuery(e.target.value)}} />
+                {/* <Link to={`/search-question?q=${searchQuery}`} className="btn btn-outline-dark" type="button" id="button-addon2"><i className="bi bi-search"></i></Link> */}
+            </form>
+         <ul class="dropdown-menu w-100">
+{ isDataLoaded?searchQuery&&filteredQuestions.map((child)=>
+    <li><Link class="dropdown-item" to={`/questions/view?qid=${child.q_id}`}>{child.title}</Link></li>
+    )
+    : <div className="placeholder-glow text-center">
+      <div className="col-8 placeholder"></div>
+      <div className="col-8 placeholder"></div>
+    </div>
+}
+{
+  !searchQuery&&<li className='text-center' style={{fontWeight:"200"}}>Enter question to search!</li>
+}
+  </ul>
+            </div>
+           }
             {
               user ? (
                 <>
@@ -133,6 +192,7 @@ function Header(){
           </Link>
           <ul className="dropdown-menu text-small">
           <li><Link className="dropdown-item" to="/ask-question">Ask question...</Link></li>
+          <li><Link className="dropdown-item" to="/quiz">Quiz</Link></li>
             <li><Link className="dropdown-item" to="/search-question">Search question</Link></li>
             <li><Link className="dropdown-item" to="/user-dashboard">Profile</Link></li>
             <li><hr className="dropdown-divider"/></li>

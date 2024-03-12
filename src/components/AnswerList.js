@@ -1,14 +1,203 @@
+import { useState, useEffect, useRef } from "react";
+import { useLocation, Link } from "react-router-dom";
 
+import {
+  getDatabase,
+  ref,
+  get,
+  child,
+  update,
+  onValue,
+  set,
+  push,
+  orderByChild,
+  equalTo,
+} from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Spinner from "./Spinner";
 
 function AnswerList(props) {
+  const auth = getAuth();
+  const [isLoggedin, setisLoggedin] = useState(false);
+  const [uid, setUID] = useState();
+  const [voteValue, setVoteValue] = useState(0);
+  const [isDataLoaded,setDataLoaded]=useState(false);
+  const [valLoaded,setValLoaded]=useState(false)
+  const [voteLoaded,setVoteLoaded]=useState(false);
+  const [voteCount, setVoteCount] = useState(0);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUID(user.uid);
+        setisLoggedin(true);
+      } else {
+        setisLoggedin(false);
+      }
+    });
+  }, [isLoggedin]);
+
+
+  const dbvote = getDatabase();
+useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+    var uidn=user.uid;   
+
+    onValue(ref(dbvote, "votes/" + props.ans_id + uidn) , (ss) => {
+      if (ss.exists()) {
+        var value = ss.val().value;
+        setVoteValue(value); 
+        console.log(value);
+        setVoteLoaded(true);
+
+      }else {
+     set(voteRef, {
+      uid: uid,
+      ans_id: props.ans_id,
+      vote_id: props.ans_id + uid,
+      value: 0,
+        });
+        setVoteValue(0);
+        setValLoaded(true);
+        setVoteLoaded(true);
+      }
+
+    });
+
+  }
+});
+  }, []);
+
+  const dbans = getDatabase();
+  const ansRef = useRef(ref(dbans, `answers/${props.ans_id}`)); 
+
+  useEffect(() => {
+    const fetchVoteCount = async () => {
+      try {
+        const snapshot = await get(ansRef.current);
+        if (snapshot.exists()) {
+          setVoteCount(snapshot.val().vote_count);
+       
+        }
+      } catch (error) {
+        console.error("Error fetching vote count:", error);
+      }
+    };
+
+    fetchVoteCount();
+  }, [props.ans_id]);
+
+  const voteRef = ref(dbans, "votes/" + props.ans_id + uid);
+
+  
+  const voteUp = async () => {
+  //  console.log("voteUp called")
+    try {
+      const snapshot2 = await get(voteRef);
+     
+      if (snapshot2.exists()) {
+        var value = snapshot2.val().value;
+        setVoteValue(value);
+        setValLoaded(true);          
+
+      } else {
+        await set(voteRef, {
+          uid: uid,
+          ans_id: props.ans_id,
+          vote_id: props.ans_id + uid,
+          value: 0,
+        });
+        setVoteValue(0);
+        setValLoaded(true);
+      }
+
+      if(valLoaded){
+        const snapshot = await get(ansRef.current);
+        if (snapshot.exists()) {
+          const votecount = snapshot.val().vote_count;
+       
+          if (voteValue === 0) {
+            setVoteValue(1);
+            await update(ansRef.current, { vote_count: votecount + 1 });
+            await update(voteRef, { value: 1 });
+    
+          }else if (voteValue === -1){
+            setVoteValue(0);
+            await update(ansRef.current, { vote_count: votecount + 1 });
+            await update(voteRef, { value: 0 });
+          }
+    
+    
+        }
+    
+      }
+
+    } catch (e) {
+      console.error("Error fetching vote value:", e);
+    }
+   
+   
+  };
+
+  const voteDown = async () => {
+   
+    try {
+      const snapshot2 = await get(voteRef);
+     
+      if (snapshot2.exists()) {
+        var value = snapshot2.val().value;
+        setVoteValue(value);
+        setValLoaded(true);        
+        console.log("value loaded"+value)  
+
+      } else {
+        await set(voteRef, {
+          uid: uid,
+          ans_id: props.ans_id,
+          vote_id: props.ans_id + uid,
+          value: 0,
+        });
+        setVoteValue(0);
+        setValLoaded(true);
+      }
+
+      if(valLoaded){
+        const snapshot = await get(ansRef.current);
+        if (snapshot.exists()) {
+          const votecount = snapshot.val().vote_count;
+       
+          if (voteValue === 1) {
+            setVoteValue(0);
+            await update(ansRef.current, { vote_count: votecount - 1 });
+            await update(voteRef, { value: 0 });
+
+          }else if (voteValue === 0){
+            setVoteValue(-1);
+            await update(ansRef.current, { vote_count: votecount - 1 });
+            await update(voteRef, { value: -1 });
+          }
+          
+    
+    
+        }
+    
+      }
+
+    } catch (e) {
+      console.error("Error fetching vote value:", e);
+    }
+  };
+
+
     return (
       <div class="card m-3">
         <div class="card-body">
           <div className="row">
-            <div className="col-3  row col-lg-1" style={{ height: "200px" }}>
+            <div className="col-3  row col-lg-1 border-end me-1" style={{ height: "200px" }}>
               <div className="col-12">
                 <button
-                  className="btn btn-outline-primary rounded-circle p-2 lh-1"  
+                  className="btn btn-outline-primary rounded-circle p-2 lh-1"  onClick={voteUp} disabled={voteValue === 1}
                  >
                   <i class="bi bi-caret-up-fill"></i>
                 </button>
@@ -20,7 +209,7 @@ function AnswerList(props) {
               </div>
               <div className="col-12">
                 <button
-                  className="btn btn-outline-primary rounded-circle p-2 lh-1"
+                  className="btn btn-outline-primary rounded-circle p-2 lh-1" onClick={voteDown} disabled={voteValue === -1}
                   >
                   <i class="bi bi-caret-down-fill"></i>
                 </button>
@@ -48,10 +237,12 @@ function AnswerList(props) {
                 alt=""
               />
               <span className="ms-1 text-primary">{props.username}</span>
-              <span className="ms-1">asked {props.posted_on}</span>
+              <span className="ms-1">answered on {props.posted_on}</span>
             </div>
           </div>
         </div>
+
+        {voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
       </div>
     );
   }

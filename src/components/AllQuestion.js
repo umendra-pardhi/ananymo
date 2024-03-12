@@ -48,6 +48,7 @@ useEffect(() => {
             data.push({
               key: child.key,
               uid: child.val().uid,
+              duid:(child.val().uid).slice(0,8),
               q_id: child.val().q_id,
               title: child.val().title,
               desc: child.val().desc,
@@ -55,7 +56,8 @@ useEffect(() => {
               vote_count: child.val().vote_count,
               date: (child.val().date).match(/^\w+\s\w+\s\d+/)[0],
               tags: "",
-              views: child.val().views,     
+              views: child.val().views, 
+
             });
           });
           setQue(data);
@@ -92,7 +94,7 @@ useEffect(() => {
 { isDataLoaded? 
 combinedData.slice(0, 10).map((child) => (
 
-        <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={child.desc} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
+    <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={child.desc} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
 
 ))
 :

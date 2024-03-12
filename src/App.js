@@ -18,7 +18,10 @@ import ScrollTop from './components/ScrollTop';
 import Test from './components/Test';
 import SearchQuestion from './components/SearchQuestion';
 import ScanAbusive  from './components/ScanAbusive';
-
+// import Quiz from './components/quiz/components/Home'
+// import Game from './components/quiz/QuizHome'
+import QuizHome from './components/quiz/QuizHome';
+import Quiz from './components/quiz/Quiz';
 
 function App() {
   return (
@@ -93,7 +96,7 @@ const router=createBrowserRouter([
   {
     path:'/search-question',
     element: <>
-     <Header/>
+     <Header searchQ={true}/>
         <SearchQuestion/>
         <Footer/>
     </>
@@ -133,7 +136,15 @@ const router=createBrowserRouter([
   {
     path:'/scanabusive',
     element: <ScanAbusive/>
-  }
+  },
+  {
+    path:'/quiz',
+    element: <QuizHome/>
+  },
+  {
+    path:'/quiz/view',
+    element: <Quiz/>
+  }, 
 
 
 ]);

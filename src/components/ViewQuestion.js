@@ -41,6 +41,7 @@ function ViewQuestion(props) {
   const [isDataLoaded,setDataLoaded]=useState(false);
   const [valLoaded,setValLoaded]=useState(false)
   const [voteLoaded,setVoteLoaded]=useState(false);
+  const [sortBy, setSortBy] = useState("scoredesc");
 
 
   const auth = getAuth();
@@ -88,7 +89,7 @@ function ViewQuestion(props) {
             data.push({
               key: child.key,
               uid: child.val().uid,
-              duid: child.val().uid.slice(0, 6),
+              duid: child.val().uid.slice(0, 8),
               q_id: child.val().q_id,
               title: child.val().title,
               desc: child.val().desc,
@@ -112,6 +113,7 @@ useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
     var uidn=user.uid;   
+    console.log("this one"+user.uid)
 
 console.log(qid+uidn)
     onValue(ref(dbvote, "votes/" + qid + uidn) , (ss) => {
@@ -123,9 +125,9 @@ console.log(qid+uidn)
 
       }else {
      set(voteRef, {
-          uid: uid,
+          uid: uidn,
           q_id: qid,
-          vote_id: qid + uid,
+          vote_id: qid + uidn,
           value: 0,
         });
         setVoteValue(0);
@@ -137,7 +139,7 @@ console.log(qid+uidn)
 
   }
 });
-  }, []);
+  }, [uid]);
 
   
 
@@ -171,10 +173,36 @@ console.log(qid+uidn)
       .catch((error) => {
         console.error(error);
       });
-  }, [qid]);
+  }, []);
+
+
+useEffect(()=>{
+    const db1 = getDatabase();
+    const myRef = ref(db1, "answers");
+  
+    onValue(myRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = [];
+        snapshot.forEach((child) => {
+          if (child.val().q_id == qid) {
+            data.push({
+              ans_id:child.val().ans_id,
+              uid: child.val().uid,
+              pp: child.val().pp,
+              ansBody: child.val().ansBody,
+              vote_count: child.val().vote_count,
+              date: child.val().date.match(/^\w+\s\w+\s\d+/)[0],
+            });
+          }
+        });
+        setAnsData(data);
+        setAnsCount(ansData.length);
+        updateAnsCount(data.length)
+      }
+    });
+  },[])
 
  
-
   const database = getDatabase();
   const questionRef = useRef(ref(database, `questions/${qid}`)); 
 
@@ -304,8 +332,7 @@ console.log(qid+uidn)
         console.log("function called")
       }
     } catch (e) {
-      console.log(e);
-    }
+      console.log(e);    }
   };
 
   
@@ -351,84 +378,17 @@ console.log(qid+uidn)
       });
   }
 
-
-//   ans vote
-const AnsvoteUp = async (ans_id,uid,database) => {
-    const voteRef = ref(database, "votes/" + ans_id + uid);
-    const ansRef = useRef(ref(database, `answers/${ans_id + uid}`));
-  try {
-      const snapshot2 = await get(voteRef);
-    if (snapshot2.exists()) {
-      var value = snapshot2.val().value;
-      setVoteValue(value);
-    }
-  } catch (e) {
-    console.log(e);
-  }
-
-  try {
-    const snapshot = await get(ansRef.current);
-    if (snapshot.exists()) {
-      var votecount = snapshot.val().vote_count;
-
-      try {
-        await update(ansRef.current, { vote_count: votecount + 1 });
-        set(voteRef, {
-          uid: uid,
-          a_id: ans_id,
-          vote_id: ans_id + uid,
-          value: true,
-          votedUp: false,
-          votedDown: true,
-        })
-          .then(() => {})
-          .catch((error) => {
-            console.error(error);
-          });
-        // setHasVotedUp(true);
-        // setHasVotedDown(false);
-      } catch (error) {
-        console.error("Error voting up:", error);
-      }
-    } else {
-    }
-  } catch (error) {
-    console.error("Error fetching vote count:", error);
-  }
-};
-const AnsvoteDown = async () => {
-  try {
-    const snapshot = await get(questionRef.current);
-    if (snapshot.exists()) {
-      var votecount = snapshot.val().vote_count;
-
-      try {
-        await update(questionRef.current, { vote_count: votecount - 1 });
-        set(voteRef, {
-          uid: uid,
-          q_id: qid,
-          vote_id: qid + uid,
-          value: false,
-          votedUp: false,
-          votedDown: true,
-        })
-          .then(() => {})
-          .catch((error) => {
-            console.error(error);
-          });
-
-        setHasVotedUp(true);
-        setHasVotedDown(false);
-      } catch (error) {
-        console.error("Error voting up:", error);
-      }
-    }
-  } catch (error) {
-    console.error("Error fetching vote count:", error);
-  }
-};
-
-
+// useEffect(()=>{
+//   const sortedAnswers = ansData.sort((a, b) => {
+//     if (sortBy === "datenewest") {
+//       return new Date(b.date) - new Date(a.date); // Sort by date
+//     } else if (sortBy === "scoredesc") {
+//       return b.vote_count - a.vote_count; // Sort by highest score (vote_count)
+//     }
+//     return 0; // Default to no sorting
+//   });
+//   setAnsData(sortedAnswers)
+// },[sortBy])
   return (
     <div className="container">
   
@@ -453,7 +413,7 @@ const AnsvoteDown = async () => {
           </div>
           <div class="card-body">
             <div className="row">
-              <div className="col-3  row col-lg-1" style={{ height: "200px" }}>
+              <div className="col-3 row col-lg-1 border-end me-1" style={{ height: "200px" }}>
                
                 <div className="col-12">
                   <button
@@ -572,21 +532,22 @@ const AnsvoteDown = async () => {
           <div className="col col-lg-4">
             <h5>{ansData.length} Answers</h5>
           </div>
-          <div className="col col-lg-4 " style={{ fontWeight: "400" }}>
+          {/* <div className="col col-lg-4 " style={{ fontWeight: "400" }}>
             sorted by:
             <select
               class="form-select form-select-sm"
-              aria-label="Small select example">
+              aria-label="Small select example" value={sortBy} 
+              onChange={(event) => {
+    setSortBy(event.target.value);
+  }}
+              >
               <option value="scoredesc" selected="selected">
                 Highest score (default)
               </option>
-              <option value="trending">
-                Trending (recent votes count more)
-              </option>
-              <option value="modifieddesc">Date modified (newest first)</option>
-              <option value="createdasc">Date created (oldest first)</option>
+              <option value="datenewest">Date modified (newest first)</option>
+              <option value="dateoldest">Date created (oldest first)</option>
             </select>
-          </div>
+          </div> */}
         </div>
         {/* ans_top_header end */}
 
@@ -596,9 +557,10 @@ const AnsvoteDown = async () => {
           <AnswerList
             ansBody={child.ansBody}
             vote_count={child.vote_count}
-            username={child.uid.slice(0, 6)}
+            username={child.uid.slice(0, 8)}
             posted_on={child.date}
             pp={child.pp}
+            ans_id={child.ans_id}
 
           />
         ))}
