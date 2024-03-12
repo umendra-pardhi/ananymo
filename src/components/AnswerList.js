@@ -40,11 +40,9 @@ function AnswerList(props) {
 
   const dbvote = getDatabase();
 useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-    var uidn=user.uid;   
-
-    onValue(ref(dbvote, "votes/" + props.ans_id + uidn) , (ss) => {
+   
+if(isLoggedin){
+    onValue(ref(dbvote, "votes/" + props.ans_id + uid) , (ss) => {
       if (ss.exists()) {
         var value = ss.val().value;
         setVoteValue(value); 
@@ -52,7 +50,7 @@ useEffect(() => {
         setVoteLoaded(true);
 
       }else {
-     set(voteRef, {
+     set( ref(dbans, "votes/" + props.ans_id + uid), {
       uid: uid,
       ans_id: props.ans_id,
       vote_id: props.ans_id + uid,
@@ -64,10 +62,9 @@ useEffect(() => {
       }
 
     });
-
   }
-});
-  }, []);
+
+  }, [isLoggedin]);
 
   const dbans = getDatabase();
   const ansRef = useRef(ref(dbans, `answers/${props.ans_id}`)); 
@@ -88,11 +85,15 @@ useEffect(() => {
     fetchVoteCount();
   }, [props.ans_id]);
 
-  const voteRef = ref(dbans, "votes/" + props.ans_id + uid);
+ 
 
   
   const voteUp = async () => {
   //  console.log("voteUp called")
+  if(isLoggedin){
+
+    const voteRef = ref(dbans, "votes/" + props.ans_id + uid);
+
     try {
       const snapshot2 = await get(voteRef);
      
@@ -136,12 +137,13 @@ useEffect(() => {
     } catch (e) {
       console.error("Error fetching vote value:", e);
     }
-   
+  }
    
   };
 
   const voteDown = async () => {
-   
+   if(isLoggedin){
+    const voteRef = ref(dbans, "votes/" + props.ans_id + uid);
     try {
       const snapshot2 = await get(voteRef);
      
@@ -187,6 +189,7 @@ useEffect(() => {
     } catch (e) {
       console.error("Error fetching vote value:", e);
     }
+  }
   };
 
 
@@ -242,7 +245,8 @@ useEffect(() => {
           </div>
         </div>
 
-        {voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
+        {/* {
+          voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> } */}
       </div>
     );
   }

@@ -9,9 +9,6 @@ import {
   update,
   onValue,
   set,
-  push,
-  orderByChild,
-  equalTo,
 } from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {AnswerList,AnswerListLoading} from "./AnswerList";
@@ -35,7 +32,7 @@ function ViewQuestion(props) {
   const [successMessage, setSuccessMessage] = useState("");
   const [ansBody, setAnsBody] = useState("");
   const [isLoggedin, setisLoggedin] = useState(false);
-  const [uid, setUID] = useState();
+  const [uid, setUID] = useState("");
   const [voteValue, setVoteValue] = useState(0);
   const [ansCount, setAnsCount] = useState(0);
   const [isDataLoaded,setDataLoaded]=useState(false);
@@ -45,6 +42,8 @@ function ViewQuestion(props) {
 
 
   const auth = getAuth();
+  const database = getDatabase();
+  const questionRef = useRef(ref(database, `questions/${qid}`)); 
 
   useEffect(() => {
     const updateViewCount = async () => {
@@ -110,13 +109,9 @@ function ViewQuestion(props) {
 
   const dbvote = getDatabase();
 useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-    var uidn=user.uid;   
-    console.log("this one"+user.uid)
 
-console.log(qid+uidn)
-    onValue(ref(dbvote, "votes/" + qid + uidn) , (ss) => {
+  if(isLoggedin){
+    onValue(ref(dbvote, "votes/" + qid + uid ) , (ss) => {
       if (ss.exists()) {
         var value = ss.val().value;
         setVoteValue(value); 
@@ -124,10 +119,10 @@ console.log(qid+uidn)
         setVoteLoaded(true);
 
       }else {
-     set(voteRef, {
-          uid: uidn,
+     set(ref(dbvote, "votes/" + qid + uid) , {
+          uid: uid,
           q_id: qid,
-          vote_id: qid + uidn,
+          vote_id: qid + uid,
           value: 0,
         });
         setVoteValue(0);
@@ -135,11 +130,13 @@ console.log(qid+uidn)
         setVoteLoaded(true);
       }
 
-    });
 
-  }
 });
-  }, [uid]);
+
+  }else{
+    console.log("this is why i am geting error")
+  }
+  }, [isLoggedin]);
 
   
 
@@ -179,7 +176,6 @@ console.log(qid+uidn)
 useEffect(()=>{
     const db1 = getDatabase();
     const myRef = ref(db1, "answers");
-  
     onValue(myRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = [];
@@ -203,8 +199,7 @@ useEffect(()=>{
   },[])
 
  
-  const database = getDatabase();
-  const questionRef = useRef(ref(database, `questions/${qid}`)); 
+
 
   useEffect(() => {
     const fetchVoteCount = async () => {
@@ -221,12 +216,14 @@ useEffect(()=>{
 
     fetchVoteCount();
   }, [qid]);
+  
+
+
 
   const voteRef = ref(database, "votes/" + qid + uid);
-
   
   const voteUp = async () => {
-   
+     if(isLoggedin){
     try {
       const snapshot2 = await get(voteRef);
      
@@ -270,12 +267,12 @@ useEffect(()=>{
     } catch (e) {
       console.error("Error fetching vote value:", e);
     }
-   
+  }
    
   };
 
   const voteDown = async () => {
-   
+    if(isLoggedin){
     try {
       const snapshot2 = await get(voteRef);
      
@@ -320,22 +317,22 @@ useEffect(()=>{
     } catch (e) {
       console.error("Error fetching vote value:", e);
     }
+  }
   };
 
   const qRef = useRef(ref(database, `questions/${qid}`));
-  const aRef = useRef(ref(database, `answers/${qid + uid}`));
+  // const aRef = useRef(ref(database, `answers/${qid + uid}`));
   const updateAnsCount = async (anscount) => {
     try {
       const snapshot = await get(qRef.current);
       if (snapshot.exists()) {
         await update(questionRef.current, { ans_count: anscount });
-        console.log("function called")
       }
     } catch (e) {
       console.log(e);    }
   };
 
-  
+
   function submitAns() {
     if (ansBody === "") {
       alert("Answer must be non-empty");
@@ -377,6 +374,7 @@ useEffect(()=>{
         setIsLoading(false);
       });
   }
+
 
 // useEffect(()=>{
 //   const sortedAnswers = ansData.sort((a, b) => {
@@ -577,7 +575,8 @@ useEffect(()=>{
         />
       </div>
 
-      {voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
+      {/* {isLoggedin&&
+        voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> } */}
     </div>
   );
 }
@@ -676,7 +675,8 @@ function PostAnswer(props) {
             </div>
           )}
 
-          {!props.isLoading? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
+          {
+            !props.isLoading? <Spinner display='d-none'/> : <Spinner display='d-block'/> }
           {/* </form> */}
         </div>
       </div>

@@ -1,27 +1,39 @@
 import React, { useState, useEffect } from 'react';
-
+import que from './questions.json';
 
 const Quiz = () => {
-    const [questions, setQuestions] = useState([
-        {
-            "text": "What is the capital of France?",
-            "options": ["Paris", "London", "Berlin", "Madrid"],
-            "correctOptionIndex": 0
-        },
-        {
-            "text": "What is 2 + 2?",
-            "options": ["3", "4", "5", "6"],
-            "correctOptionIndex": 1
+    const [questions, setQuestions] = useState([]);
+    const [questionsNew, setQuestionsNew] = useState([]);
+
+    useEffect(() => {
+     
+         setQuestions(que)
+
+      }, []);
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
         }
-        // Add more questions here as needed
-    ]);
+        return array;
+      }
+      
+      useEffect(()=>{
+      const shuffledQuestions = shuffleArray(questions);
+      const selectedQuestions = shuffledQuestions.slice(0, 20);
+
+      setQuestionsNew(selectedQuestions)
+      },[])
+
+
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
     const [score, setScore] = useState(0);
     const [showResult, setShowResult] = useState(false);
 
     const handleAnswer = (answerIndex) => {
-        const isCorrect = answerIndex === questions[currentQuestion].correctOptionIndex;
+        const isCorrect = answerIndex === questionsNew[currentQuestion].correctOptionIndex;
         setUserAnswers({
             ...userAnswers,
             [currentQuestion]: {
@@ -31,14 +43,13 @@ const Quiz = () => {
         });
         setScore(score + (isCorrect ? 1 : 0));
 
-        // Automatically move to the next question after 2 seconds
         setTimeout(() => {
-            if (currentQuestion < questions.length - 1) {
+            if (currentQuestion < questionsNew.length - 1) {
                 setCurrentQuestion(currentQuestion + 1);
             } else {
                 setShowResult(true);
             }
-        }, 2000);
+        }, 1000);
     };
 
     const resetQuiz = () => {
@@ -49,13 +60,13 @@ const Quiz = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container mt-5 mb-5">
             {showResult ? (
                 <div>
                     <h2>Quiz Result</h2>
                     <p>Your score: {score}</p>
                     <ul>
-                        {questions.map((question, index) => (
+                        {questionsNew.map((question, index) => (
                             <li key={index}>
                                 Question {index + 1}: {question.text}
                                 <br />

@@ -139,11 +139,23 @@ const router=createBrowserRouter([
   },
   {
     path:'/quiz',
-    element: <QuizHome/>
+  
+    element:
+    <>
+    <Header/>
+    <QuizHome/>
+    <Footer/>
+</>
+
   },
   {
     path:'/quiz/view',
-    element: <Quiz/>
+    element:  
+    <>
+    <Header/>
+    <Quiz/>
+    <Footer/>
+</>
   }, 
 
 

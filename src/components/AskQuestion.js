@@ -40,10 +40,10 @@ const [isAbusiveDesc,setAbusiveDesc]=useState();
       alert("Title must be non-empty");
       return;
     }
-    if (desc === "") {
-      alert("Body must be non-empty");
-      return;
-    }
+    // if (desc === "") {
+    //   alert("Body must be non-empty");
+    //   return;
+    // }
     if (!isLoggedin) {
       alert("Login first");
       return;

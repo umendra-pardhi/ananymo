@@ -150,6 +150,33 @@ combinedData.slice(0, 10).map((child) => (
 </div>
 </div>
 
+{/* quiz */}
+
+<div className="container">
+        <div className="row p-4 border mt-5">
+          <div className="col-12 col-lg-6  p-4">
+            <h1
+              style={{ fontWeight: "900", fontSize: "50px", color: "#F1495B" }}>
+              Elevate Your Coding
+              <br /> Knowledge with Quiz
+            </h1>
+            <Link to='/quiz/view'>  <button className="btn btn-outline-danger  ">Start Quiz</button></Link>
+          </div>
+
+          <div className="col-12 col-lg-6">
+            <lottie-player
+              src="https://lottie.host/7c36f6af-5587-4ca7-b87f-9830554d6fd1/jnzZKbhxDy.json"
+              speed="1"
+              style={{ width: "100%" }}
+              loop
+              autoplay
+              direction="1"
+              mode="normal"></lottie-player>
+          </div>
+        </div>
+
+
+      </div>
 
 {/* promo banner */}
 <div className="container-fluid  p-5 promo-bg" >

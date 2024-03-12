@@ -11,7 +11,7 @@ function QuizHome() {
               Elevate Your Coding
               <br /> Knowledge with Quiz
             </h1>
-            <button className="btn btn-outline-danger  ">Join Quiz</button>
+            <Link to='/quiz/view'>  <button className="btn btn-outline-danger  ">Start Quiz</button></Link>
           </div>
 
           <div className="col-12 col-lg-6">
@@ -30,7 +30,7 @@ function QuizHome() {
           <div className="col-8 border border-danger rounded-1 bg-danger-subtle p-2 m-1">
             <div className="row">
               <div className="col-4">
-                <p>Quiz Title</p>
+                <p>Programming Quiz</p>
               </div>
               <div className="col-4">
                 <span className="rounded-pill bg-danger p-1 text-light float-end">
@@ -38,19 +38,19 @@ function QuizHome() {
                 </span>
               </div>
               <div className="col-4">
-                <Link to='/quiz/view?quizid=2'><button className="btn btn-danger btn-sm">Start Quiz</button></Link>
+                <Link to='/quiz/view'><button className="btn btn-danger btn-sm">Start Quiz</button></Link>
               </div>
             </div>
-            <div className="row p-0 m-0">
+            {/* <div className="row p-0 m-0">
               <p className="float-end m-0 p-0" style={{ fontWeight: "200" }}>
                 created on
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
 
-      <dotlottie-player
+      {/* <dotlottie-player
         src="https://lottie.host/c90a58da-68c3-471b-926f-7a96a34a6703/MegjLIaA9P.json"
         background="transparent"
         speed="1"
@@ -64,9 +64,9 @@ function QuizHome() {
         speed="1"
         style={{ width: "300px", height: "300px" }}
         loop
-        autoplay></dotlottie-player>
+        autoplay></dotlottie-player> */}
 
-        <Quiz/>
+     
     </>
   );
 }
