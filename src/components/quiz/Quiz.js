@@ -4,13 +4,12 @@ import que from './questions.json';
 const Quiz = () => {
     const [questions, setQuestions] = useState([]);
     const [questionsNew, setQuestionsNew] = useState([]);
+    const [dataLoaded,setDataLoaded]=useState(false)
 
     useEffect(() => {
-     
-         setQuestions(que)
-
-      }, []);
-
+        setQuestions(que)  
+      }, [questions]);
+   
       function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -18,14 +17,14 @@ const Quiz = () => {
         }
         return array;
       }
-      
+
       useEffect(()=>{
-      const shuffledQuestions = shuffleArray(questions);
-      const selectedQuestions = shuffledQuestions.slice(0, 20);
 
-      setQuestionsNew(selectedQuestions)
-      },[])
+    const shuffledQuestions = shuffleArray(questions);
+  const selectedQuestions = shuffledQuestions.slice(0, 20);
+  setQuestionsNew(selectedQuestions)
 
+      },[questions])
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
@@ -65,28 +64,28 @@ const Quiz = () => {
                 <div>
                     <h2>Quiz Result</h2>
                     <p>Your score: {score}</p>
-                    <ul>
+                    <div>
                         {questionsNew.map((question, index) => (
-                            <li key={index}>
-                                Question {index + 1}: {question.text}
-                                <br />
+                            <div className='bg-primary-subtle card p-2 m-2' key={index}>
+                               <p className='text-primary m-0 p-0'> Question {index + 1}: {question.text}</p>
+                                
                                 Your Answer: {question.options[userAnswers[index]?.selected]}
                                 <br />
                                 Correct Answer: {question.options[question.correctOptionIndex]}
-                            </li>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                     <button className="btn btn-primary" onClick={resetQuiz}>Restart Quiz</button>
                 </div>
             ) : (
                 <div>
                     <h2>Question {currentQuestion + 1}</h2>
-                    <p>{questions[currentQuestion]?.text}</p>
+                    <p>{questionsNew[currentQuestion]?.text}</p>
                     <ul className="list-group">
-                        {questions[currentQuestion]?.options.map((option, index) => (
+                        {questionsNew[currentQuestion]?.options.map((option, index) => (
                             <li
                                 key={index}
-                                className={`list-group-item ${userAnswers[currentQuestion]?.selected === index ? (index === questions[currentQuestion].correctOptionIndex ? 'bg-primary text-light' : 'bg-primary text-light') : ''}`}
+                                className={`list-group-item ${userAnswers[currentQuestion]?.selected === index ? (index === questionsNew[currentQuestion].correctOptionIndex ? 'bg-primary text-light' : 'bg-primary text-light') : ''}`}
                                 onClick={() => handleAnswer(index)}
                                 style={{ cursor: 'pointer' }}
                             >

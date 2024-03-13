@@ -14,6 +14,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {AnswerList,AnswerListLoading} from "./AnswerList";
 import Spinner from "./Spinner";
 import ScanAbusive from "./ScanAbusive";
+import MarkdownRender from "./MarkdownRender";
 
 function ViewQuestion(props) {
   const location = useLocation();
@@ -226,7 +227,6 @@ useEffect(()=>{
      if(isLoggedin){
     try {
       const snapshot2 = await get(voteRef);
-     
       if (snapshot2.exists()) {
         var value = snapshot2.val().value;
         setVoteValue(value);
@@ -258,8 +258,6 @@ useEffect(()=>{
             await update(questionRef.current, { vote_count: votecount + 1 });
             await update(voteRef, { value: 0 });
           }
-    
-    
         }
     
       }
@@ -440,10 +438,10 @@ useEffect(()=>{
         
               </div>
               <div className="col-9 col-lg-10 ">
-                <p style={{ fontWeight: "400" }} className="card-text">
+                {/* <p style={{ fontWeight: "400" }} className="card-text">
                   {child.desc}
-                </p>
-              </div>
+                </p> */}
+                <div  dangerouslySetInnerHTML={{ __html: MarkdownRender(child.desc) }} /> </div>
             </div>
 
             {/* <div className="tags">

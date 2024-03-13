@@ -151,8 +151,8 @@ function Header(props){
               </li>                     
               
             </ul>
-
-           <Link to={'/ask-question'} className={`btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0 ${props.searchQ&&"me-lg-5"}`}>Ask Question</Link>
+            <Link to={'/quiz/view'} className={`btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-5 mt-lg-0`}>Start Quiz</Link>
+           <Link to={'/ask-question'} className={`btn  btn-outline-dark me-lg-2 mb-1 mb-lg-0 d-block mt-2 mt-lg-0 ${props.searchQ&&"me-lg-5"}`}>Ask Question</Link>
            { !props.searchQ&&
 
            <div className="dropdown-center">

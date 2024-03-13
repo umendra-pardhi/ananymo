@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, Link } from "react-router-dom";
+import MarkdownRender from "./MarkdownRender";
 
 import {
   getDatabase,
@@ -194,6 +195,7 @@ if(isLoggedin){
 
 
     return (
+      
       <div class="card m-3">
         <div class="card-body">
           <div className="row">
@@ -219,9 +221,11 @@ if(isLoggedin){
               </div>
             </div>
             <div className="col-9 col-lg-10 ">
-              <p style={{ fontWeight: "400" }} className="card-text">
-                {props.ansBody}
-              </p>
+              <>
+              <div  dangerouslySetInnerHTML={{ __html: MarkdownRender(props.ansBody) }} /> 
+              </>
+              
+             
             </div>
           </div>
           {/* <div className="tags">
@@ -245,9 +249,9 @@ if(isLoggedin){
           </div>
         </div>
 
-        {/* {
-          voteLoaded ? <Spinner display='d-none'/> : <Spinner display='d-block'/> } */}
       </div>
+
+
     );
   }
 
