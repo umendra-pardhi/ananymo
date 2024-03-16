@@ -134,7 +134,7 @@ useEffect(() => {
 { isDataLoaded? 
 combinedData.slice(0, 10).map((child) => (
 
-        <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={(child.desc).slice(0,350)} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
+        <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={(child.desc).slice(0,300)} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
 
 ))
 :
@@ -153,7 +153,7 @@ combinedData.slice(0, 10).map((child) => (
 {/* quiz */}
 
 <div className="container">
-        <div className="row p-4 border mt-5">
+        <div className="row p-4mt-5">
           <div className="col-12 col-lg-6  p-4">
             <h1
               style={{ fontWeight: "900", fontSize: "50px", color: "#F1495B" }}>

@@ -39,7 +39,6 @@ useEffect(() => {
     const database = getDatabase();
     const dbRef = ref(database, "questions");
 
-
     get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -92,10 +91,8 @@ useEffect(() => {
 </div>
 
 { isDataLoaded? 
-combinedData.slice(0, 10).map((child) => (
-
-    <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={(child.desc).slice(0,350)} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
-
+combinedData.map((child) => (
+    <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={(child.desc).slice(0,300)} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
 ))
 :
 <>

@@ -437,11 +437,11 @@ useEffect(()=>{
 
         
               </div>
-              <div className="col-9 col-lg-10 ">
+              <div className="col-9 col-lg-11 ">
                 {/* <p style={{ fontWeight: "400" }} className="card-text">
                   {child.desc}
                 </p> */}
-                <div  dangerouslySetInnerHTML={{ __html: MarkdownRender(child.desc) }} /> </div>
+                <div className="overflow-scroll"  dangerouslySetInnerHTML={{ __html: MarkdownRender(child.desc) }} /> </div>
             </div>
 
             {/* <div className="tags">

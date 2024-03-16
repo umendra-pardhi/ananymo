@@ -159,7 +159,7 @@ useEffect(()=>{
 { isDataLoaded? 
 
 Qquery&&filteredQuestions.map((child) => (
-    <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={(child.desc).slice(0,350)} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
+    <QueBlock votes={child.vote_count} ans_count={child.ans_count} view_count={child.views} q_title={child.title} q_desc={(child.desc).slice(0,300)} img={child.pp} username={child.duid} posted_on={child.date} q_id={child.q_id} />
 ))
 :
 <>

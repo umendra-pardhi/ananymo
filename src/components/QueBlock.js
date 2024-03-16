@@ -1,4 +1,6 @@
 import {Link} from 'react-router-dom';
+import MarkdownRender from './MarkdownRender';
+
 
 function QueBlock(props){
     return(
@@ -14,7 +16,10 @@ function QueBlock(props){
         </div>
   <div class="card-body">
     <Link to={`/questions/view?qid=${props.q_id}`} state={{ scrollToTop: true }}  class="text-decoration-none " >{props.q_title}</Link>
-    <p style={{fontWeight:"400"}} className='card-text'>{props.q_desc}</p>
+    {/* <p style={{fontWeight:"400"}} className='card-text'>{props.q_desc}</p> */}
+<>
+    <div className=""  dangerouslySetInnerHTML={{ __html: MarkdownRender(props.q_desc) }} /> 
+</>
     {/* <div className="tags">
         <Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>
             python

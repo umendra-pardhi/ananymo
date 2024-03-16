@@ -220,9 +220,9 @@ if(isLoggedin){
                 </button>
               </div>
             </div>
-            <div className="col-9 col-lg-10 ">
+            <div className="col-9 col-lg-11 ">
               <>
-              <div  dangerouslySetInnerHTML={{ __html: MarkdownRender(props.ansBody) }} /> 
+              <div className="overflow-scroll"  dangerouslySetInnerHTML={{ __html: MarkdownRender(props.ansBody) }} /> 
               </>
               
              
