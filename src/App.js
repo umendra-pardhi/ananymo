@@ -22,6 +22,8 @@ import ScanAbusive  from './components/ScanAbusive';
 // import Game from './components/quiz/QuizHome'
 import QuizHome from './components/quiz/QuizHome';
 import Quiz from './components/quiz/Quiz';
+import HowToAns from './components/HowToAns';
+import AdminLogin from './components/admin/AdminLogin'
 
 function App() {
   return (
@@ -128,9 +130,19 @@ const router=createBrowserRouter([
     </>
   },
   {
+    path:'/admin-login',
+    element: <>
+    <Header/>
+
+       <AdminLogin/>
+        <Footer/>
+    </>
+  },
+  {
     path:'/test',
     element: <>
    <Test/>
+   <AdminLogin/>
     </>
   },
   {
@@ -154,6 +166,15 @@ const router=createBrowserRouter([
     <>
     <Header/>
     <Quiz/>
+    <Footer/>
+</>
+  }, 
+  {
+    path:'/help/how-to-answer',
+    element:  
+    <>
+    <Header/>
+    <HowToAns/>
     <Footer/>
 </>
   }, 

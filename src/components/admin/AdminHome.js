@@ -13,18 +13,27 @@ function AdminHome() {
   const [newUsername, setnewUsername] = useState("");
   const [userData,setUserdata]=useState([]);
 
+
   const navigate = useNavigate();
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        if(user.uid=='ehAJeiUUnQRRBAXqAC55DDTRHyb2' || user.uid=='4pWnoFAtafexTE4XbqNlXicXM5r1'  ){
+         
+       
         const uid = user.uid;
         setisLoggedin(user);
         setName(user.displayName);
         setPic(user.photoURL);
         setUsername(uid);
         setnewUsername(uid);
+
+      }else{
+        alert("unauthorized access")
+        navigate("/");
+      }
       } else {
-        navigate("/login");
+        navigate("/admin-login");
         setisLoggedin(null);
       }
     });
@@ -34,7 +43,7 @@ function AdminHome() {
     signOut(auth)
       .then(() => {
         console.log("Signed out ");
-        navigate("/login");
+        navigate("/admin-login");
       })
       .catch((error) => {
         // An error happened.
@@ -258,9 +267,30 @@ function AdminHome() {
         </div>
       </div>
 
-      {username ? <Spinner display="d-none" /> : <Spinner display="d-block" />}
+      {username ? <Spinnerad display="d-none" /> : <Spinnerad display="d-block" />}
+     
     </>
   );
 }
+
+
+function Spinnerad(props){
+  return(
+      <div className={`w-100 h-100  position-fixed fixed-top d-flex justify-content-center align-items-center ${props.display}`} style={{zIndex:"1000",backgroundColor: "#fff"}}>
+  <div >
+  <div class="spinner-grow text-success m-1 shadow-lg" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <div class="spinner-grow text-danger m-1" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <div class="spinner-grow text-warning m-1" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  
+  </div>
+      </div>
+  )
+  }
 
 export default AdminHome;

@@ -38,7 +38,7 @@ useEffect(() => {
 useEffect(() => {
     const database = getDatabase();
     const dbRef = ref(database, "questions");
-
+    
     get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {

@@ -1,20 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, Link } from "react-router-dom";
-
-import {
-  getDatabase,
-  ref,
-  get,
-  child,
-  update,
-  onValue,
-  set,
-} from "firebase/database";
+import {getDatabase,ref,get,child,update,onValue,set} from "firebase/database";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {AnswerList,AnswerListLoading} from "./AnswerList";
 import Spinner from "./Spinner";
 import ScanAbusive from "./ScanAbusive";
 import MarkdownRender from "./MarkdownRender";
+import '../assets/styles/code.css'
 
 function ViewQuestion(props) {
   const location = useLocation();
@@ -40,7 +32,6 @@ function ViewQuestion(props) {
   const [valLoaded,setValLoaded]=useState(false)
   const [voteLoaded,setVoteLoaded]=useState(false);
   const [sortBy, setSortBy] = useState("scoredesc");
-
 
   const auth = getAuth();
   const database = getDatabase();
@@ -73,9 +64,7 @@ function ViewQuestion(props) {
     });
   }, [isLoggedin]);
 
-  {
-    /* question data */
-  }
+  {/* question data */}
 
   useEffect(() => {
     const database = getDatabase();
@@ -130,8 +119,6 @@ useEffect(() => {
         setValLoaded(true);
         setVoteLoaded(true);
       }
-
-
 });
 
   }else{
@@ -139,7 +126,6 @@ useEffect(() => {
   }
   }, [isLoggedin]);
 
-  
 
   {
     /*Answers Data*/
@@ -173,7 +159,6 @@ useEffect(() => {
       });
   }, []);
 
-
 useEffect(()=>{
     const db1 = getDatabase();
     const myRef = ref(db1, "answers");
@@ -199,9 +184,6 @@ useEffect(()=>{
     });
   },[])
 
- 
-
-
   useEffect(() => {
     const fetchVoteCount = async () => {
       try {
@@ -218,8 +200,6 @@ useEffect(()=>{
     fetchVoteCount();
   }, [qid]);
   
-
-
 
   const voteRef = ref(database, "votes/" + qid + uid);
   

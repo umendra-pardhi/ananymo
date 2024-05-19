@@ -81,7 +81,7 @@ useEffect(() => {
         pp: userData.find((user) => user.uid === questions.uid)?.pp, // Find matching user and add pp
       }))
     );
-  }, [questions, userData]); 
+  }, [questions, userData]);  
 
   
     return(

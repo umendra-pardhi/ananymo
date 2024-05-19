@@ -1,12 +1,9 @@
 import {Link} from 'react-router-dom';
 import MarkdownRender from './MarkdownRender';
 
-
 function QueBlock(props){
     return(
-     
 <div class="card m-3">
-
         <div className="card-header">
             <div className="row">
                 <div className="col col-lg-3">{props.votes} votes</div>
@@ -20,11 +17,7 @@ function QueBlock(props){
 <>
     <div className=""  dangerouslySetInnerHTML={{ __html: MarkdownRender(props.q_desc) }} /> 
 </>
-    {/* <div className="tags">
-        <Link className="badge text-bg-primary m-1" style={{fontWeight:"200"}}>
-            python
-        </Link>
-    </div> */}
+   
   </div>
   <div class="card-footer " style={{fontWeight:"300"}}>
   <div className="row float-end">

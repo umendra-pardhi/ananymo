@@ -39,8 +39,7 @@ function Dashboard() {
   const [votesGainedQ,setVotesGainedQ]=useState(0);
   const [votesGainedA,setVotesGainedA]=useState(0);
 
-
-
+  
   const navigate = useNavigate();
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {

@@ -20,7 +20,7 @@ const Quiz = () => {
 
       useEffect(()=>{
 
-    const shuffledQuestions = shuffleArray(questions);
+  const shuffledQuestions = shuffleArray(questions);
   const selectedQuestions = shuffledQuestions.slice(0, 20);
   setQuestionsNew(selectedQuestions)
 
@@ -51,6 +51,24 @@ const Quiz = () => {
         }, 1000);
     };
 
+    const prev=()=>{
+        setTimeout(() => {
+            if (currentQuestion >0) {
+                setCurrentQuestion(currentQuestion - 1);
+            } 
+        }, 1000);
+    }
+
+    const next=()=>{
+        setTimeout(() => {
+            if (currentQuestion < questionsNew.length - 1) {
+                setCurrentQuestion(currentQuestion + 1);
+            } else {
+                setShowResult(true);
+            }
+        }, 1000);
+    }
+
     const resetQuiz = () => {
         setCurrentQuestion(0);
         setUserAnswers({});
@@ -66,13 +84,24 @@ const Quiz = () => {
                     <p>Your score: {score}</p>
                     <div>
                         {questionsNew.map((question, index) => (
-                            <div className='bg-primary-subtle card p-2 m-2' key={index}>
-                               <p className='text-primary m-0 p-0'> Question {index + 1}: {question.text}</p>
-                                
+                            question.options[userAnswers[index]?.selected]==question.options[question.correctOptionIndex] ?
+                            <div className='card p-2 m-2 border-success bg-success-subtle'  key={index}>
+                               <p className='text-success m-0 p-0'> Question {index + 1}: {question.text}</p>
+                               <p style={{fontWeight:"400",fontSize:"14px"}}>
                                 Your Answer: {question.options[userAnswers[index]?.selected]}
                                 <br />
                                 Correct Answer: {question.options[question.correctOptionIndex]}
+                                </p>
+                            </div>:
+                            <div className='card p-2 m-2 border-danger bg-danger-subtle'  key={index}>
+                               <p className='text-danger m-0 p-0'> Question {index + 1}: {question.text}</p>
+                                <p  style={{fontWeight:"400",fontSize:"14px"}}>
+                                Your Answer: {question.options[userAnswers[index]?.selected]}
+                                <br />
+                                Correct Answer: {question.options[question.correctOptionIndex]}
+                                </p>
                             </div>
+
                         ))}
                     </div>
                     <button className="btn btn-primary" onClick={resetQuiz}>Restart Quiz</button>
@@ -93,6 +122,14 @@ const Quiz = () => {
                             </li>
                         ))}
                     </ul>
+                    <div className="row mt-5">
+                        <div className="col-6">
+                            <button className='btn btn-primary' onClick={prev}>Prev</button>
+                        </div>
+                        <div className="col-6">
+                        <button className='btn btn-primary' onClick={next} >Next</button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
