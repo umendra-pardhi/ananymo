@@ -616,7 +616,7 @@ function PostAnswer(props) {
               <ul>
                 <li>
                   Asking for help, clarification, or responding to other
-                  answers.
+                  answers. 
                 </li>
                 <li>
                   Making statements based on opinion; back them up with
